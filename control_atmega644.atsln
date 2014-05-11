@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "control_atmega644", "control_atmega644.cproj", "{9ED547DB-1B2D-4045-9837-54221B617B23}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9ED547DB-1B2D-4045-9837-54221B617B23}.Debug|AVR.ActiveCfg = Debug|AVR
+		{9ED547DB-1B2D-4045-9837-54221B617B23}.Debug|AVR.Build.0 = Debug|AVR
+		{9ED547DB-1B2D-4045-9837-54221B617B23}.Release|AVR.ActiveCfg = Release|AVR
+		{9ED547DB-1B2D-4045-9837-54221B617B23}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
