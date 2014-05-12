@@ -44,6 +44,10 @@
 #define bit_flip(p,m) ((p) ^= (m))
 #define bit_write(c,p,m) (c ? bit_set(p,m) : bit_clear(p,m))
 
+#define ConvertTo_float(b1,b2,b3,b4) (float)(((b1)<<24)|((b2)<<16)|((b3)<<8)|(b4))
+// convertTo_uint16(MSB, LSB)
+#define ConvertTo_uint16(b1,b2) (uint16_t)(((b1)<<8)|(b2))
+
 /*
 ** constants/macros
 */

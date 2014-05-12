@@ -151,6 +151,17 @@ void set_ERROR(unsigned char on)
 	}
 }
 
+void set_trip_temperature (uint8_t val)
+{
+	trip_values.temp_trip = val;
+	//TODO: store in EEPROM
+}
+
+void set_trip_current_val (uint16_t val) {
+	trip_values.Imod_trip_AMP = val;
+		//TODO: store in EEPROM
+}
+
 void SSPA_IO_init(void) {
 	// define BIAS_ENABLE, LED_TX, LED_ERROR,PSU_ENABLE as output and set all to defined state 
 	set_LEDerror(OFF);  // led error is off
@@ -313,6 +324,7 @@ int main(void)
 	sei(); // needed for uart libray
 	activeMenu = Imod_menu;  //default menu is current display of all  4 modules
 	temperature(); // get temperature
+	comm_tx_version();
 	while(TRUE)
     {
 		   //-	Get ADC input vals for power measurements
@@ -356,24 +368,20 @@ int main(void)
 				 	
 			if (button_pressed() == TRUE) activeMenu = nextActiveMenu();
 			set_LEDtx(ON);  // just to check it is on
-			uart_tx_status();
-			
-//			uart_tx_temperatures();
-			//uart_tx_temperatureTrip();
-//
+		//	uart_tx_status();
+		
 //			uart_tx_currentVals();
 			//uart_tx_currentADCVals();
-			//uart_tx_currentTripADC();
-			//uart_tx_currentTripVal();
-			//uart_tx_currentCalibrationADC2Amp();
-			//uart_tx_currentCalibrationAmp2ADC();
+			
+			
+			
+			//
 ////
 			//uart_tx_powerADCVals();
 //			uart_tx_powerVals();
-			//uart_tx_powerTripADC();
-			//uart_tx_powerTripVals();
-			//uart_tx_powerCalibrationADC2W();
-			//uart_tx_powerCalibrationW2ADC();
+
+			//
+			//
 			comm_RX_process();
 
     }
