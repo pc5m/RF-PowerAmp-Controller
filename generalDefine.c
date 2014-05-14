@@ -94,3 +94,10 @@ enum activeMenus activeMenu = Imod_menu;
 enum ErrorStates activeError = NoError;
 
 uint8_t SSPAstatus = 0;
+
+uint8_t autoTransmitCurrentVals = FALSE;
+uint8_t autoTransmitPowerVals = FALSE;
+uint8_t controlConnected = FALSE;
+uint8_t autoTransmitPowerADC  = FALSE;
+uint8_t autoTransmitCurrentADC  = FALSE;
+uint8_t autoTransmitTemperature  = FALSE;

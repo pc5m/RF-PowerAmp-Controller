@@ -157,9 +157,96 @@ void set_trip_temperature (uint8_t val)
 	//TODO: store in EEPROM
 }
 
-void set_trip_current_val (uint16_t val) {
+void set_trip_current_val (uint8_t val) {
 	trip_values.Imod_trip_AMP = val;
 		//TODO: store in EEPROM
+}
+
+void set_trip_current_adc (uint8_t moduleID, uint16_t val) {
+	switch (moduleID)
+	{
+		case MODULE_A: trip_values.ImodA_trip_ADC = val; break;
+		case MODULE_B: trip_values.ImodB_trip_ADC = val; break;
+		case MODULE_C: trip_values.ImodC_trip_ADC = val; break;
+		case MODULE_D: trip_values.ImodD_trip_ADC = val; break;
+		default:
+		break;
+	}
+	//TODO: store in EEPROM
+}
+
+void set_cal_currents_amp2adc (uint8_t moduleID, float val) {
+	switch (moduleID)
+	{
+		case MODULE_A: cal_values.ImodA_AMP2ADC = val; break;
+		case MODULE_B: cal_values.ImodB_AMP2ADC = val; break;
+		case MODULE_C: cal_values.ImodC_AMP2ADC = val; break;
+		case MODULE_D: cal_values.ImodD_AMP2ADC = val; break;
+		default: break;
+	}
+	//TODO: store in EEPROM
+}
+
+void set_cal_currents_adc2amp (uint8_t moduleID, float val) {
+	switch (moduleID)
+	{
+		case MODULE_A: cal_values.ImodA_ADC2AMP = val; break;
+		case MODULE_B: cal_values.ImodB_ADC2AMP = val; break;
+		case MODULE_C: cal_values.ImodC_ADC2AMP = val; break;
+		case MODULE_D: cal_values.ImodD_ADC2AMP = val; break;
+		default: break;
+	}
+	//TODO: store in EEPROM
+}
+
+void set_trip_powers_val(uint8_t powerID, uint16_t val) {
+	switch (powerID)
+	{
+		case POWER_FWD:  trip_values.Pfwrd_trip_W = val; break;
+		case POWER_REFL: trip_values.Prefl_trip_W = val; break; 
+		case POWER_IN:   trip_values.Pin_trip_W = val;  break;
+		default:break;
+	}
+	//TODO: store in EEPROM
+}
+
+void set_trip_swr_val(float val) {
+	trip_values.swr_trip = val; 
+	//TODO: store in EEPROM
+}
+
+void set_trip_powers_adc(uint8_t powerID, uint16_t val) {
+	switch (powerID)
+	{
+		case POWER_FWD:  trip_values.Pfwrd_trip_ADC = val; break;
+		case POWER_REFL: trip_values.Prefl_trip_ADC = val; break;
+		case POWER_IN:   trip_values.Pin_trip_ADC = val;   break;
+		case POWER_SWR:  trip_values.SWR_trip_ADC = val;   break;
+		default: break;
+	}
+	//TODO: store in EEPROM
+}
+
+void set_cal_powers_w2adc(uint8_t powerID, float val) {
+	switch (powerID)
+	{
+		case POWER_FWD:  cal_values.Pfwrd_W2ADC = val; break;
+		case POWER_REFL: cal_values.Prefl_W2ADC = val; break;
+		case POWER_IN:   cal_values.Pin_W2ADC = val;   break;
+		default: break;
+	}
+	//TODO: store in EEPROM
+}
+
+void set_cal_powers_adc2w(uint8_t powerID, float val) {
+	switch (powerID)
+	{
+		case POWER_FWD:  cal_values.Pfwrd_ADC2W = val; break;
+		case POWER_REFL: cal_values.Prefl_ADC2W = val; break;
+	    case POWER_IN:   cal_values.Pin_ADC2W = val;   break;
+		default: break;
+	}
+	//TODO: store in EEPROM
 }
 
 void SSPA_IO_init(void) {
@@ -232,20 +319,6 @@ enum ErrorStates CheckForOverload(void) {
 	SSPAstatus |= (uint8_t)error;
 	return(error);
 }
- 
-//ISR (TIMER0_OVF_vect)
-//{
-	//bit_flip(PORTD,BIT(PD5));
-	//TCNT0 = 76;
-	//lcd_puts("PC5M");
-//}
-//
-//void initTimer()
-//{
-	//bit_set(TCCR0B, BIT(CS02) | BIT(CS00)) ;  /* set clock for counter 0  prescaler to 1024 */
-	//TCNT0 = 76; // give 10mS interrupt
-	//bit_set(TIMSK0,BIT(TOIE0)) ;     /* enable timer overflow 0 as interrupt source */
-//}
 
 void temperature()
 {
@@ -367,22 +440,27 @@ int main(void)
                  set_TX(OFF);	
 				 	
 			if (button_pressed() == TRUE) activeMenu = nextActiveMenu();
-			set_LEDtx(ON);  // just to check it is on
-		//	uart_tx_status();
-		
-//			uart_tx_currentVals();
-			//uart_tx_currentADCVals();
-			
-			
-			
-			//
-////
-			//uart_tx_powerADCVals();
-//			uart_tx_powerVals();
 
-			//
-			//
+			if (controlConnected == TRUE)
+			{
+				uart_tx_status();
+				
+				if (autoTransmitCurrentVals == TRUE) {
+					uart_tx_currentVals();
+				}
+				if (autoTransmitCurrentADC == TRUE) {
+					uart_tx_currentADCVals();
+				}
+				if (autoTransmitPowerVals == TRUE) {
+					uart_tx_powerVals();
+				}
+				if (autoTransmitPowerADC == TRUE) {
+					uart_tx_powerADCVals();
+				}
+				if (autoTransmitTemperature == TRUE) {
+					uart_tx_temperatures();				
+				}
+			}
 			comm_RX_process();
-
     }
 }

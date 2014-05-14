@@ -13,6 +13,7 @@
 
 Com_Message_struct Com_Message_Rx;		//Struct which contains data of the last received message
 
+
 // determine next state, based on previous state and received byte, fill Com_message structure with data
 uint8_t nextState (uint8_t prevState, uint8_t rxByte) 
 {
@@ -67,6 +68,31 @@ uint8_t nextState (uint8_t prevState, uint8_t rxByte)
 
 void comm_RX_process(void)
 {
+	//union {
+		//float f;
+		//unsigned long ul;
+	//} uu;
+//
+	//unsigned char a, b, c, d;
+//
+	//uu.ul = (a << 24) | (b << 16) | (c << 8) | d;
+	//
+	//float snelheid;
+//
+	//union u_tag {
+		//uint8_t b[4];
+		//float fval;
+	//} u;
+//
+	//u.b[0] = snelheidArray[0];
+	//u.b[1] = snelheidArray[1];
+	//u.b[2] = snelheidArray[2];
+	//u.b[3] = snelheidArray[3];
+//
+	//snelheid = u.fval;
+	
+	
+	
 	static uint8_t state;
 	uint16_t rxData;
 	while ((rxData = uart_getc())!= UART_NO_DATA){
@@ -80,58 +106,33 @@ void comm_RX_process(void)
 			{
 				switch(Com_Message_Rx.id)
 				{
-					case PC_ID_REQ_FW_VERSION: comm_tx_version();
-					break;
-					case  PC_ID_SET_STATUS_AUTOTX_STATUS: // insert function //
-					break;
-					case  PC_ID_SET_STATUS_AUTOTX_CURRENTS_ADC: // insert function //
-					break;
-					case  PC_ID_SET_STATUS_AUTOTX_CURRENTS_VALS: // insert function //
-					break;
-					case  PC_ID_REQ_CURRENT_TRIP_ADC: uart_tx_currentTripADC();
-					break;
-					case  PC_ID_REQ_CURRENT_TRIP_VAL: uart_tx_currentTripVal();
-					break;
-					case  PC_ID_REQ_CAL_CURRENTS_AMP2ADC: uart_tx_currentCalibrationAmp2ADC();
-					break;
-					case  PC_ID_REQ_CAL_CURRENTS_ADC2AMP: uart_tx_currentCalibrationADC2Amp();
-					break;
-					case  PC_ID_SET_CURRENT_TRIP_ADC: // insert function //
-					break;
-					case  PC_ID_SET_CURRENT_TRIP_VAL:  set_trip_current_val( ConvertTo_uint16(Com_Message_Rx.data[0], Com_Message_Rx.data[1] ));
-					break;
-					case  PC_ID_SET_CAL_CURRENTS_AMP2ADC: // insert function //
-					break;
-					case  PC_ID_SET_CAL_CURRENTS_ADC2AMP: // insert function //
-					break;
-					case  PC_ID_SET_STATUS_AUTOTX_POWERS_ADC: // insert function //
-					break;
-					case  PC_ID_SET_STATUS_AUTOTX_POWERS_VALS:// insert function //
-					break;
-					case  PC_ID_REQ_POWERS_TRIP_ADC: uart_tx_powerTripADC();
-					break;
-					case  PC_ID_REQ_POWERS_TRIP_VALS: uart_tx_powerTripVals();
-					break;
-					case  PC_ID_REQ_CAL_POWERS_W2ADC: uart_tx_powerCalibrationW2ADC();
-					break;
-					case  PC_ID_REQ_CAL_POWERS_ADC2W: uart_tx_powerCalibrationADC2W();
-					break;
-					case  PC_ID_SET_POWERS_TRIP_ADC:// insert function //
-					break;
-					case  PC_ID_SET_POWERS_TRIP_VAL: // insert function //
-					break;
-					case  PC_ID_SET_CAL_POWERS_W2ADC: // insert function //
-					break;
-					case  PC_ID_SET_CAL_POWERS_ADC2W: // insert function //
-					break;
-					case  PC_ID_REQ_TEMPS: uart_tx_temperatures();
-					break;
-					case  PC_ID_REQ_TEMP_TRIP: uart_tx_temperatureTrip();
-					break;
-					case  PC_ID_SET_TEMP_TRIP: set_trip_temperature(Com_Message_Rx.data[0]);
-					break;
-					default:
-					break;
+					case  PC_ID_REQ_FW_VERSION: comm_tx_version(); break;
+					case  PC_ID_SET_STATUS_AUTOTX_STATUS: if (Com_Message_Rx.data[0] == TRUE) controlConnected = TRUE; else controlConnected = FALSE; break;
+					case  PC_ID_SET_STATUS_AUTOTX_CURRENTS_ADC: if (Com_Message_Rx.data[0] == TRUE) autoTransmitCurrentADC = TRUE; else autoTransmitCurrentADC = FALSE; break;
+					case  PC_ID_SET_STATUS_AUTOTX_CURRENTS_VALS: if (Com_Message_Rx.data[0] == TRUE) autoTransmitCurrentVals = TRUE; else autoTransmitCurrentVals = FALSE; break;
+					case  PC_ID_REQ_CURRENT_TRIP_ADC: uart_tx_currentTripADC(); break;
+					case  PC_ID_REQ_CURRENT_TRIP_VAL: uart_tx_currentTripVal(); break;
+					case  PC_ID_REQ_CAL_CURRENTS_AMP2ADC: uart_tx_currentCalibrationAmp2ADC(); break;
+					case  PC_ID_REQ_CAL_CURRENTS_ADC2AMP: uart_tx_currentCalibrationADC2Amp(); break;
+					case  PC_ID_SET_CURRENT_TRIP_ADC: set_trip_current_adc(Com_Message_Rx.data[0],*(uint16_t *)&Com_Message_Rx.data[1]); break;
+					case  PC_ID_SET_CURRENT_TRIP_VAL: set_trip_current_val(Com_Message_Rx.data[0]); break;
+					case  PC_ID_SET_CAL_CURRENTS_AMP2ADC: set_cal_currents_amp2adc(Com_Message_Rx.data[0],*(float *)&(Com_Message_Rx.data[1])); break;
+					case  PC_ID_SET_CAL_CURRENTS_ADC2AMP: set_cal_currents_adc2amp(Com_Message_Rx.data[0],*(float *)&(Com_Message_Rx.data[1])); break;
+					case  PC_ID_SET_STATUS_AUTOTX_POWERS_ADC:  if (Com_Message_Rx.data[0] == TRUE) autoTransmitPowerADC = TRUE; else autoTransmitPowerADC = FALSE; break;
+					case  PC_ID_SET_STATUS_AUTOTX_POWERS_VALS:  if (Com_Message_Rx.data[0] == TRUE) autoTransmitPowerVals = TRUE; else autoTransmitPowerVals = FALSE; break;
+					case  PC_ID_REQ_POWERS_TRIP_ADC: uart_tx_powerTripADC(); break;
+					case  PC_ID_REQ_POWERS_TRIP_VALS: uart_tx_powerTripVals(); break;
+					case  PC_ID_REQ_CAL_POWERS_W2ADC: uart_tx_powerCalibrationW2ADC(); break;
+					case  PC_ID_REQ_CAL_POWERS_ADC2W: uart_tx_powerCalibrationADC2W(); break;
+					case  PC_ID_SET_POWERS_TRIP_ADC: set_trip_powers_adc(Com_Message_Rx.data[0],*(uint16_t *)&Com_Message_Rx.data[1]); break;
+					case  PC_ID_SET_POWERS_TRIP_VAL: set_trip_powers_val(Com_Message_Rx.data[0],*(uint16_t *)&Com_Message_Rx.data[1]); break;
+				    case  PC_ID_SET_SWR_TRIP_VAL: set_trip_swr_val(*(float *)&Com_Message_Rx.data[0]); break;
+					case  PC_ID_SET_CAL_POWERS_W2ADC: set_cal_powers_w2adc(Com_Message_Rx.data[0],*(float *)&(Com_Message_Rx.data[1])); break;
+					case  PC_ID_SET_CAL_POWERS_ADC2W: set_cal_powers_adc2w(Com_Message_Rx.data[0],*(float *)&(Com_Message_Rx.data[1])); break;
+					case  PC_ID_SET_STATUS_AUTOTX_TEMP: if (Com_Message_Rx.data[0] == TRUE) autoTransmitTemperature = TRUE; else autoTransmitTemperature = FALSE; break;
+					case  PC_ID_REQ_TEMP_TRIP: uart_tx_temperatureTrip(); break;
+					case  PC_ID_SET_TEMP_TRIP: set_trip_temperature(Com_Message_Rx.data[0]); break;
+					default: break;
 				}
 				state = UNKNOWN;
 				Com_Message_Rx.id = 0xFF;

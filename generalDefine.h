@@ -183,4 +183,21 @@ extern uint8_t SSPAstatus;   // status with flags
 #define FLAG_PSU_ON  5
 #define FLAG_BIAS_ON 4
 
+#define MODULE_A 0
+#define MODULE_B 1
+#define MODULE_C 2
+#define MODULE_D 3
+
+#define POWER_FWD  0
+#define POWER_REFL 1
+#define POWER_IN   2
+#define POWER_SWR  3
+
+extern uint8_t autoTransmitCurrentVals;
+extern uint8_t autoTransmitCurrentADC;
+extern uint8_t autoTransmitPowerVals;
+extern uint8_t autoTransmitPowerADC;
+extern uint8_t autoTransmitTemperature;
+extern uint8_t controlConnected;
+
 #endif /* generalDefine_H_ */

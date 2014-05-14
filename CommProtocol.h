@@ -45,13 +45,14 @@
 #define PC_ID_REQ_POWERS_TRIP_VALS				15
 #define PC_ID_SET_POWERS_TRIP_ADC				16
 #define PC_ID_SET_POWERS_TRIP_VAL				17
-#define PC_ID_SET_CAL_POWERS_W2ADC				18
-#define PC_ID_SET_CAL_POWERS_ADC2W				19
-#define PC_ID_REQ_CAL_POWERS_W2ADC				20
-#define PC_ID_REQ_CAL_POWERS_ADC2W				21
-#define PC_ID_REQ_TEMPS							22
-#define PC_ID_REQ_TEMP_TRIP						23
-#define PC_ID_SET_TEMP_TRIP						24
+#define PC_ID_SET_SWR_TRIP_VAL				    18
+#define PC_ID_SET_CAL_POWERS_W2ADC				19
+#define PC_ID_SET_CAL_POWERS_ADC2W				20
+#define PC_ID_REQ_CAL_POWERS_W2ADC				21
+#define PC_ID_REQ_CAL_POWERS_ADC2W				22
+#define PC_ID_SET_STATUS_AUTOTX_TEMP     		23
+#define PC_ID_REQ_TEMP_TRIP						24
+#define PC_ID_SET_TEMP_TRIP						25
 
 /* IDs sent from MC to PC */
 #define MC_ID_STATUS				0
