@@ -26,6 +26,7 @@
 */
 
 #include <stdint.h>
+#include <avr/eeprom.h>
 
 #define FW_VERSION_NR 1
 #define F_CPU 18432000UL      /*18,432 MHz external oscillator */
@@ -111,23 +112,15 @@ typedef struct {
 } tripValuesStruct;
 
 typedef struct {
-	uint16_t ImodA_max_ADC;  // ADC value  ? Maximum current [A]
-	uint16_t ImodA_max_AMP;  // maximum value of current, used in display
 	float    ImodA_ADC2AMP;  // factor to convert  ADC value to current in [A]
 	float    ImodA_AMP2ADC;  // factor to convert current [A] to ADC value
 
-	uint16_t ImodB_max_ADC;  // ADC value  ?  Maximum current [A]
-	uint16_t ImodB_max_AMP;  // maximum value of current, used in display
 	float    ImodB_ADC2AMP;  // factor to convert  ADC value to current in [A]
 	float    ImodB_AMP2ADC;	 // factor to convert current [A] to ADC value
 
-	uint16_t ImodC_max_ADC;  // ADC value  ?  Maximum current [A]
-	uint16_t ImodC_max_AMP;  // maximum value of current, used in display
 	float    ImodC_ADC2AMP;  // factor to convert  ADC value to current in [A]
 	float    ImodC_AMP2ADC;	 // factor to convert current [A] to ADC value
 
-	uint16_t ImodD_max_ADC;  // ADC value  ?  Maximum current [A]
-	uint16_t ImodD_max_AMP;  // maximum value of current, used in display
 	float    ImodD_ADC2AMP;  // factor to convert  ADC value to current in [A]
 	float    ImodD_AMP2ADC;	 // factor to convert current [A] to ADC value
 
@@ -175,6 +168,7 @@ extern currentValuesStruct current;  // calibrated I current values
 extern powerValuesStruct power;      //calibrated P values
 
 extern enum activeMenus activeMenu;
+extern enum activeMenus nextMenu;
 extern enum ErrorStates activeError;
 
 extern uint8_t SSPAstatus;   // status with flags
@@ -199,5 +193,9 @@ extern uint8_t autoTransmitPowerVals;
 extern uint8_t autoTransmitPowerADC;
 extern uint8_t autoTransmitTemperature;
 extern uint8_t controlConnected;
+
+/* EEPROM global values */
+extern tripValuesStruct EEMEM EEtrip_values;
+extern calValuesStruct EEMEM EEcal_values;
 
 #endif /* generalDefine_H_ */

@@ -68,31 +68,6 @@ uint8_t nextState (uint8_t prevState, uint8_t rxByte)
 
 void comm_RX_process(void)
 {
-	//union {
-		//float f;
-		//unsigned long ul;
-	//} uu;
-//
-	//unsigned char a, b, c, d;
-//
-	//uu.ul = (a << 24) | (b << 16) | (c << 8) | d;
-	//
-	//float snelheid;
-//
-	//union u_tag {
-		//uint8_t b[4];
-		//float fval;
-	//} u;
-//
-	//u.b[0] = snelheidArray[0];
-	//u.b[1] = snelheidArray[1];
-	//u.b[2] = snelheidArray[2];
-	//u.b[3] = snelheidArray[3];
-//
-	//snelheid = u.fval;
-	
-	
-	
 	static uint8_t state;
 	uint16_t rxData;
 	while ((rxData = uart_getc())!= UART_NO_DATA){

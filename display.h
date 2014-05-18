@@ -47,5 +47,19 @@ extern void display_Menu (enum activeMenus menu);
 */
 extern void display_error ();
 
+/**
+ @brief    Prepare for using bargrpaphs
+ @param    none                                        
+ @return   none
+*/
+extern void display_InitBargraph();
+
+
+/**
+ @brief    Display bargraphs for data on specific menu
+ @param    menu to be displayed                                     
+ @return   none
+*/
+extern void display_Bargraph (enum activeMenus menu);
 
 #endif /* DISPLAY_H_ */

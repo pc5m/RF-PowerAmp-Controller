@@ -9,6 +9,29 @@
 #include "lcd.h"
 #include <stdlib.h>
 
+#define BARGRAPH_COUNT 9 //nr of full bargraph's
+
+volatile static const PROGMEM unsigned char BargraphElements[] =
+{
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0F,
+	0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x1F,
+	0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x1F,
+	0x1C, 0x1C, 0x1C, 0x1C, 0x1C, 0x1C, 0x1C, 0x1F,
+	0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x1F,
+	0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F
+};
+
+
+void display_InitBargraph()
+{
+	uint8_t i;
+	lcd_command(_BV(LCD_CGRAM));  /* set CG RAM start address 0 */
+	for(i=0; i<48; i++)
+	{
+		lcd_data(pgm_read_byte_near(&BargraphElements[i]));
+	}
+}
+
 
 /*************************************************************************
 Display float with width and nrOfDigits without auto linefeed, maximum width of 10
@@ -99,6 +122,75 @@ void display_Menu (enum activeMenus menu)
 			display_FormattedLine(4,"I-D ",current.moduleD,4,1," A");
 			activeMenu = Imod_menu;
 			break;
+	}
+}
+
+
+
+/**
+ @brief    Display bar for data on specific menu
+ @param    16bit word for line nr (max 1024) , value to be displayed and max value                                      
+ @return   none
+*/
+void display_Bar (uint8_t line, uint16_t val, uint16_t bar_max )
+{
+	int i,j;
+	int valsPerChar = bar_max/BARGRAPH_COUNT;
+	int valsPerSubChar = valsPerChar/5;
+	lcd_gotoxy(11,--line);
+
+	for (i = 0; i<BARGRAPH_COUNT; i++) 	
+	{
+		if (val > valsPerChar)
+		{
+			lcd_putc(5);
+			val = val - valsPerChar;
+		}
+		else
+		{
+			valsPerSubChar = valsPerChar /5;
+			if (val > 4 * valsPerSubChar) lcd_putc(5);
+			else if (val > 3 * valsPerSubChar) lcd_putc(4);
+			else if (val > 2 * valsPerSubChar) lcd_putc(3);
+			else if (val > 1 * valsPerSubChar) lcd_putc(2);
+			else lcd_putc(1);
+			for (j=0; j<BARGRAPH_COUNT-1-i; j++)
+			{
+				lcd_putc(0);
+			}
+			break;
+		}
+	}
+}
+
+
+/**
+ @brief    Display bargraphs for data on specific menu
+ @param    menu to be displayed                                        
+ @return   none
+*/
+void display_Bargraph (enum activeMenus menu)
+{
+	switch (menu)
+	{
+	case Gen_Menu:
+			display_Bar(1,adc_values.pwrFwrd_ADC,trip_values.Pfwrd_trip_ADC);
+			display_Bar(3,(adc_values.iModuleA_ADC+adc_values.iModuleB_ADC+adc_values.iModuleD_ADC+adc_values.iModuleA_ADC)/4, 
+			                   (trip_values.ImodA_trip_ADC+trip_values.ImodB_trip_ADC+trip_values.ImodC_trip_ADC+trip_values.ImodD_trip_ADC)/4);
+			break;
+	case Pall_menu:
+			display_Bar(1,adc_values.pwrFwrd_ADC,trip_values.Pfwrd_trip_ADC);
+			display_Bar(2,adc_values.pwrRefl_ADC,trip_values.Prefl_trip_ADC);
+			display_Bar(3,adc_values.pwrIn_ADC,trip_values.Pin_trip_ADC);
+			// display_FormattedLine(4,"SWR 1:",power.swr,1,0,"   ");
+			break;
+	case Imod_menu:
+	    	display_Bar(1,adc_values.iModuleA_ADC,trip_values.ImodA_trip_ADC);
+	    	display_Bar(2,adc_values.iModuleB_ADC,trip_values.ImodB_trip_ADC);
+			display_Bar(3,adc_values.iModuleC_ADC,trip_values.ImodC_trip_ADC);
+			display_Bar(4,adc_values.iModuleD_ADC,trip_values.ImodD_trip_ADC);
+			break;
+	default: break;
 	}
 }
 

@@ -2,9 +2,8 @@
  * control_atmega644.c
  *
  * Created: 16-4-2014 13:59:44
- *  Author: cmobach
+ *  Author: PC5M, C. Mobach
  */ 
-
 
 #include "generalDefine.h"
 #include <avr/io.h>
@@ -30,11 +29,7 @@
 #define PSU_ENABLE  PD6
 #define BUTTON_IN   PD5 // TP21
 
-
-/* 9600 baud */
 #define UART_BAUD_RATE      115200
-
-
 uint8_t uartTxBuffer[10];
 
 /*
@@ -154,100 +149,106 @@ void set_ERROR(unsigned char on)
 void set_trip_temperature (uint8_t val)
 {
 	trip_values.temp_trip = val;
-	//TODO: store in EEPROM
+	eeprom_update_byte(&EEtrip_values.temp_trip, val);
 }
 
 void set_trip_current_val (uint8_t val) {
 	trip_values.Imod_trip_AMP = val;
-		//TODO: store in EEPROM
+    eeprom_update_word(&EEtrip_values.Imod_trip_AMP, val );
 }
 
 void set_trip_current_adc (uint8_t moduleID, uint16_t val) {
 	switch (moduleID)
 	{
-		case MODULE_A: trip_values.ImodA_trip_ADC = val; break;
-		case MODULE_B: trip_values.ImodB_trip_ADC = val; break;
-		case MODULE_C: trip_values.ImodC_trip_ADC = val; break;
-		case MODULE_D: trip_values.ImodD_trip_ADC = val; break;
+		case MODULE_A: trip_values.ImodA_trip_ADC = val; eeprom_update_word(&EEtrip_values.ImodA_trip_ADC, val ); break;
+		case MODULE_B: trip_values.ImodB_trip_ADC = val; eeprom_update_word(&EEtrip_values.ImodB_trip_ADC, val ); break;
+		case MODULE_C: trip_values.ImodC_trip_ADC = val; eeprom_update_word(&EEtrip_values.ImodC_trip_ADC, val ); break;
+		case MODULE_D: trip_values.ImodD_trip_ADC = val; eeprom_update_word(&EEtrip_values.ImodD_trip_ADC, val ); break;
 		default:
 		break;
 	}
-	//TODO: store in EEPROM
 }
 
 void set_cal_currents_amp2adc (uint8_t moduleID, float val) {
 	switch (moduleID)
 	{
-		case MODULE_A: cal_values.ImodA_AMP2ADC = val; break;
-		case MODULE_B: cal_values.ImodB_AMP2ADC = val; break;
-		case MODULE_C: cal_values.ImodC_AMP2ADC = val; break;
-		case MODULE_D: cal_values.ImodD_AMP2ADC = val; break;
+		case MODULE_A: cal_values.ImodA_AMP2ADC = val; eeprom_update_float(&EEcal_values.ImodA_AMP2ADC, val ); break;
+		case MODULE_B: cal_values.ImodB_AMP2ADC = val; eeprom_update_float(&EEcal_values.ImodB_AMP2ADC, val ); break;
+		case MODULE_C: cal_values.ImodC_AMP2ADC = val; eeprom_update_float(&EEcal_values.ImodC_AMP2ADC, val ); break;
+		case MODULE_D: cal_values.ImodD_AMP2ADC = val; eeprom_update_float(&EEcal_values.ImodD_AMP2ADC, val ); break;
 		default: break;
 	}
-	//TODO: store in EEPROM
 }
 
 void set_cal_currents_adc2amp (uint8_t moduleID, float val) {
 	switch (moduleID)
 	{
-		case MODULE_A: cal_values.ImodA_ADC2AMP = val; break;
-		case MODULE_B: cal_values.ImodB_ADC2AMP = val; break;
-		case MODULE_C: cal_values.ImodC_ADC2AMP = val; break;
-		case MODULE_D: cal_values.ImodD_ADC2AMP = val; break;
+		case MODULE_A: cal_values.ImodA_ADC2AMP = val; eeprom_update_float(&EEcal_values.ImodA_ADC2AMP, val ); break;
+		case MODULE_B: cal_values.ImodB_ADC2AMP = val; eeprom_update_float(&EEcal_values.ImodB_ADC2AMP, val ); break;
+		case MODULE_C: cal_values.ImodC_ADC2AMP = val; eeprom_update_float(&EEcal_values.ImodC_ADC2AMP, val ); break;
+		case MODULE_D: cal_values.ImodD_ADC2AMP = val; eeprom_update_float(&EEcal_values.ImodD_ADC2AMP, val ); break;
 		default: break;
 	}
-	//TODO: store in EEPROM
 }
 
+
+// set power trip values in memory and in EEPROM
+// Input: powerID: ID of the trip power to be set, val: trip value to be set	
 void set_trip_powers_val(uint8_t powerID, uint16_t val) {
 	switch (powerID)
 	{
-		case POWER_FWD:  trip_values.Pfwrd_trip_W = val; break;
-		case POWER_REFL: trip_values.Prefl_trip_W = val; break; 
-		case POWER_IN:   trip_values.Pin_trip_W = val;  break;
+		case POWER_FWD:  trip_values.Pfwrd_trip_W = val; eeprom_update_word(&EEtrip_values.Pfwrd_trip_W, val); break;
+		case POWER_REFL: trip_values.Prefl_trip_W = val; eeprom_update_word(&EEtrip_values.Prefl_trip_W, val); break; 
+		case POWER_IN:   trip_values.Pin_trip_W = val;   eeprom_update_word(&EEtrip_values.Pin_trip_W, val);   break;
 		default:break;
 	}
-	//TODO: store in EEPROM
-}
+} // set_trip_powers_val(uint8_t powerID, uint16_t val)
 
+
+// set swr trip values in memory and in EEPROM
+// Input: val: trip value to be set
 void set_trip_swr_val(float val) {
-	trip_values.swr_trip = val; 
-	//TODO: store in EEPROM
-}
+	trip_values.swr_trip = val;
+	eeprom_update_float(&EEtrip_values.swr_trip, val);
+} // set_trip_swr_val(float val)
 
+
+// set power trip ADC values in memory and in EEPROM
+// Input: powerID: ID of the trip power to be set, val: trip ADC value to be set
 void set_trip_powers_adc(uint8_t powerID, uint16_t val) {
 	switch (powerID)
 	{
-		case POWER_FWD:  trip_values.Pfwrd_trip_ADC = val; break;
-		case POWER_REFL: trip_values.Prefl_trip_ADC = val; break;
-		case POWER_IN:   trip_values.Pin_trip_ADC = val;   break;
-		case POWER_SWR:  trip_values.SWR_trip_ADC = val;   break;
+		case POWER_FWD:  trip_values.Pfwrd_trip_ADC = val; eeprom_update_word(&EEtrip_values.Pfwrd_trip_ADC, val); break;
+		case POWER_REFL: trip_values.Prefl_trip_ADC = val; eeprom_update_word(&EEtrip_values.Prefl_trip_ADC, val); break;
+		case POWER_IN:   trip_values.Pin_trip_ADC = val;   eeprom_update_word(&EEtrip_values.Pin_trip_ADC, val);   break;
+		case POWER_SWR:  trip_values.SWR_trip_ADC = val;   eeprom_update_word(&EEtrip_values.SWR_trip_ADC, val);   break;
 		default: break;
 	}
-	//TODO: store in EEPROM
-}
+} // set_trip_powers_adc(uint8_t powerID, uint16_t val)
 
+// set calibration values for power, Watt to ADC conversion in memory and in EEPROM
+// Input: powerID: ID of the calibration power to be set, val: Watt to ADC  value to be set			
 void set_cal_powers_w2adc(uint8_t powerID, float val) {
 	switch (powerID)
 	{
-		case POWER_FWD:  cal_values.Pfwrd_W2ADC = val; break;
-		case POWER_REFL: cal_values.Prefl_W2ADC = val; break;
-		case POWER_IN:   cal_values.Pin_W2ADC = val;   break;
+		case POWER_FWD:  cal_values.Pfwrd_W2ADC = val; eeprom_update_float(&EEcal_values.Pfwrd_W2ADC, val); break;
+		case POWER_REFL: cal_values.Prefl_W2ADC = val; eeprom_update_float(&EEcal_values.Prefl_W2ADC, val); break;
+		case POWER_IN:   cal_values.Pin_W2ADC = val;   eeprom_update_float(&EEcal_values.Pin_W2ADC, val);   break;
 		default: break;
 	}
-	//TODO: store in EEPROM
-}
+} // set_cal_powers_w2adc(uint8_t powerID, float val)
 
+// set_cal_powers_adc2w (uint8_t powerID, float val) - set calibration values for power, ADC to Watt conversion in memory and in EEPROM
+// Input: powerID: ID of the calibration power to be set, val: ADC to Watt value to be set	    
 void set_cal_powers_adc2w(uint8_t powerID, float val) {
 	switch (powerID)
 	{
-		case POWER_FWD:  cal_values.Pfwrd_ADC2W = val; break;
-		case POWER_REFL: cal_values.Prefl_ADC2W = val; break;
-	    case POWER_IN:   cal_values.Pin_ADC2W = val;   break;
+		case POWER_FWD:  cal_values.Pfwrd_ADC2W = val; eeprom_update_float(&EEcal_values.Pfwrd_ADC2W, val); break;
+		case POWER_REFL: cal_values.Prefl_ADC2W = val; eeprom_update_float(&EEcal_values.Prefl_ADC2W, val); break;
+	    case POWER_IN:   cal_values.Pin_ADC2W = val;   eeprom_update_float(&EEcal_values.Pin_ADC2W, val);   break;
 		default: break;
 	}
-	//TODO: store in EEPROM
-}
+} //set_cal_powers_adc2w(uint8_t powerID, float val)
 
 void SSPA_IO_init(void) {
 	// define BIAS_ENABLE, LED_TX, LED_ERROR,PSU_ENABLE as output and set all to defined state 
@@ -260,11 +261,6 @@ void SSPA_IO_init(void) {
 	bit_clear(DDRD, (BIT(PTT_IN) | BIT (OVERLOAD_IN) | BIT(BUTTON_IN) ) ); 	// define PTT_IN and OVERLOAD_IN as input 
 	bit_set(PORTD,BIT(PTT_IN) | BIT(BUTTON_IN)  );                          // enable pull up resistor on PTT_IN and BUTTON_IN
 	bit_clear(PORTD,BIT (OVERLOAD_IN) );                                      // disable pull up resistor on OVERLOAD_IN
-}
-
-void getCalibrationData(void)
-{
-	// todo: get values from EEPROM , for testing the values set in general defines are used
 }
 
 // Calculate actual currents, taken into account calibration values
@@ -292,7 +288,6 @@ void CalculatePowerAndSWR(void)
 	
 enum ErrorStates CheckForError(void)
 { 
-	
 	// if (adc_values.iModuleA_ADC > trip_values.ImodA_trip_ADC) return (ImodA);
 	// if (adc_values.iModuleB_ADC > trip_values.ImodB_trip_ADC) return (ImodB);
 	// if (adc_values.iModuleC_ADC > trip_values.ImodC_trip_ADC) return (ImodC);
@@ -333,7 +328,6 @@ void temperature()
 	if ((temp_values.tempB != 255) && (temp_values.tempB > temp_values.tempMax )) temp_values.tempMax = temp_values.tempB;
 	if ((temp_values.tempC != 255) && (temp_values.tempC > temp_values.tempMax )) temp_values.tempMax = temp_values.tempC;
 	if ((temp_values.tempD != 255) && (temp_values.tempD > temp_values.tempMax )) temp_values.tempMax = temp_values.tempD;
-	
 }
 
 /**
@@ -377,25 +371,58 @@ enum activeMenus nextActiveMenu(){
 
 void SetErrorState()
 {
-	
+
 }
+
+void loadEEpromVals() 
+{
+	eeprom_read_block(&trip_values, &EEtrip_values, sizeof(EEtrip_values));
+	eeprom_read_block(&cal_values, &EEcal_values, sizeof(EEcal_values));
+}
+
+void ProcessSerialCommunication() 
+{
+	if (controlConnected == TRUE)
+	{
+		uart_tx_status();
+		if (autoTransmitCurrentVals == TRUE) {
+			uart_tx_currentVals();
+		}
+		if (autoTransmitCurrentADC == TRUE) {
+			uart_tx_currentADCVals();
+		}
+		if (autoTransmitPowerVals == TRUE) {
+			uart_tx_powerVals();
+		}
+		if (autoTransmitPowerADC == TRUE) {
+			uart_tx_powerADCVals();
+		}
+		if (autoTransmitTemperature == TRUE) {
+			uart_tx_temperatures();				
+		}
+	}
+	comm_RX_process();   // check if a command is received and act upon
+}
+
 
 
 
 int main(void)
 {
 	uint16_t temperatureCounterDisplay = 0;
-		
 	MCUCR=(1<<JTD); // disable JTAG on portC
 	MCUCR=(1<<JTD); // disable JTAG on portC
-    SSPA_IO_init();      // initialize unit: BIAS = OFF, PSU = ON, RX STATE
+    SSPA_IO_init();      // initialize unit: BIAS = OFF, PSU = ON, RX STAT;
+	loadEEpromVals();
 	lcd_init(LCD_DISP_ON);
+	display_InitBargraph();
 	lcd_clrscr();
 	adc_init();
 	lm75_init();
 	uart_init( UART_BAUD_SELECT(UART_BAUD_RATE,F_CPU) ); 
 	sei(); // needed for uart libray
 	activeMenu = Imod_menu;  //default menu is current display of all  4 modules
+	nextMenu = Gen_Menu;
 	temperature(); // get temperature
 	comm_tx_version();
 	while(TRUE)
@@ -429,38 +456,20 @@ int main(void)
 					CalculateCurrents();
 					CalculatePowerAndSWR();
 					display_error();
-				//	uart_tx_status();
+					ProcessSerialCommunication(); //if connected than transmit serial data
 				}
 			}
-			display_Menu(activeMenu);
+			display_Menu(nextMenu);
+			activeMenu = nextMenu;
+			display_Bargraph(activeMenu);
 			
 			if (get_ptt() == ON)
 			     set_TX(ON);
 			else 
                  set_TX(OFF);	
 				 	
-			if (button_pressed() == TRUE) activeMenu = nextActiveMenu();
+			if (button_pressed() == TRUE) nextMenu = nextActiveMenu();
 
-			if (controlConnected == TRUE)
-			{
-				uart_tx_status();
-				
-				if (autoTransmitCurrentVals == TRUE) {
-					uart_tx_currentVals();
-				}
-				if (autoTransmitCurrentADC == TRUE) {
-					uart_tx_currentADCVals();
-				}
-				if (autoTransmitPowerVals == TRUE) {
-					uart_tx_powerVals();
-				}
-				if (autoTransmitPowerADC == TRUE) {
-					uart_tx_powerADCVals();
-				}
-				if (autoTransmitTemperature == TRUE) {
-					uart_tx_temperatures();				
-				}
-			}
-			comm_RX_process();
+			ProcessSerialCommunication();  //if connected than transmit serial data
     }
 }
