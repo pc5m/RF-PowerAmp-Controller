@@ -139,10 +139,12 @@ void set_ERROR(unsigned char on)
 	if (on)
 	{
 		bit_set(SSPAstatus,BIT(FLAG_ERROR));
+	    set_LEDerror(ON);
 	}
 	else
 	{
 		bit_clear(SSPAstatus,BIT(FLAG_ERROR));
+		set_LEDerror(OFF);
 	}
 }
 
@@ -410,6 +412,7 @@ void ProcessSerialCommunication()
 int main(void)
 {
 	uint16_t temperatureCounterDisplay = 0;
+	uint8_t errorNotCancelled = TRUE;
 	MCUCR=(1<<JTD); // disable JTAG on portC
 	MCUCR=(1<<JTD); // disable JTAG on portC
     SSPA_IO_init();      // initialize unit: BIAS = OFF, PSU = ON, RX STAT;
@@ -450,13 +453,21 @@ int main(void)
                 set_TX(OFF);
 			    set_ERROR(ON);
 				display_error();
-				while(TRUE)    //continue to display error on error menu, until power cycle 
+				errorNotCancelled = TRUE;
+				while(errorNotCancelled)    //continue to display error on error menu, until menu button pressed 
 				{
 					adc_GetData();
 					CalculateCurrents();
 					CalculatePowerAndSWR();
 					display_error();
 					ProcessSerialCommunication(); //if connected than transmit serial data
+					if (button_pressed() == TRUE) 
+					{
+						errorNotCancelled = FALSE;
+						set_PSU(ON);
+						set_ERROR(OFF);
+						lcd_clrscr();
+					}
 				}
 			}
 			display_Menu(nextMenu);
