@@ -10,6 +10,7 @@
 #include "uart.h"
 #include "generalDefine.h"
 #include "control_atmega644.h"
+#include "string.h"  //for memcpy
 
 Com_Message_struct Com_Message_Rx;		//Struct which contains data of the last received message
 
@@ -106,7 +107,10 @@ void comm_RX_process(void)
 					case  PC_ID_SET_CAL_POWERS_ADC2W: set_cal_powers_adc2w(Com_Message_Rx.data[0],*(float *)&(Com_Message_Rx.data[1])); break;
 					case  PC_ID_SET_STATUS_AUTOTX_TEMP: if (Com_Message_Rx.data[0] == TRUE) autoTransmitTemperature = TRUE; else autoTransmitTemperature = FALSE; break;
 					case  PC_ID_REQ_TEMP_TRIP: uart_tx_temperatureTrip(); break;
-					case  PC_ID_SET_TEMP_TRIP: set_trip_temperature(Com_Message_Rx.data[0]); break;
+					case  PC_ID_SET_TEMP_TRIP: set_trip_temperature(Com_Message_Rx.data[0]); break;	
+				    case  PC_ID_REQ_CAL_POWERS_ADC2W_RC_B: uart_tx_powerCalibrationADC2W_RC_B(Com_Message_Rx.data[0]); break;
+					case  PC_ID_SET_CAL_POWERS_ADC2W_RC_B: set_powerCalibrationADC2W_RC_B(Com_Message_Rx.data[0],Com_Message_Rx.data[1],(uint16_t *)&Com_Message_Rx.data[2],(float *)&Com_Message_Rx.data[12],(float *)&Com_Message_Rx.data[28]); break;
+					// case  PC_ID_SET_CAL_POWERS_ADC2W_RC_B: set_powerCalibrationADC2W_RC_B((uint8_t *)&Com_Message_Rx.data[0]); break;
 					default: break;
 				}
 				state = UNKNOWN;
@@ -523,6 +527,43 @@ void uart_tx_powerCalibrationADC2W(){
 		uart_putc(txBuffer[i]);
 	}
 }
+
+
+/*************************************************************************
+Function: uart_tx_powerCalibrationADC2W_RC_B()
+Purpose:  Transmit the ADC to Powercalibration factors via UART new format
+Input:    none
+Returns:  none
+**************************************************************************/
+void uart_tx_powerCalibrationADC2W_RC_B(uint8_t powerID){
+	set_TX(ON);
+	#define BYTES 44 // bytes 1 to 44
+	uint8_t txBuffer[BYTES+5];
+	uint8_t i;
+	unsigned char *p;
+	txBuffer[0] = SOF;
+	txBuffer[1] = SYNC;
+	txBuffer[2] = MC_ID_POWER_CAL_ADC2W_RC_B;
+	txBuffer[3] = BYTES;
+	txBuffer[4] = powerID;
+	switch (powerID)
+	{
+	case POWER_FWD:
+		txBuffer[5] = calPower_values.Pfwrd_nr;
+		memcpy(&txBuffer[6],&calPower_values.Pfwrd_ADC,10);  // 5 *  uint16_t
+        memcpy(&txBuffer[16],&calPower_values.Pfwrd_ADC2W_RC,16);  // 4 * float
+		memcpy(&txBuffer[32],&calPower_values.Pfwrd_ADC2W_B,16);	// 4 * float
+		break;
+	}
+	txBuffer[BYTES+4] = EOFSYNC;
+	for (i=0;i<=BYTES+4;i++)
+	{
+		uart_putc(txBuffer[i]);
+	}
+	set_TX(OFF);
+}
+
+
 
 /*************************************************************************
 Function: uart_tx_powerCalibrationW2ADC()

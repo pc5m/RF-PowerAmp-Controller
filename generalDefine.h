@@ -139,6 +139,38 @@ typedef struct {
 	float     Pin_W2ADC;     // factor to convert input power  [W] to ADC value
 } calValuesStruct;
 
+#define NrOfPowerCalibrationPoints 5
+
+typedef struct {
+	uint8_t  Pfwrd_nr;			// Nr of  Pforwards calibration points
+	uint8_t  Prefl_nr;			// Nr of  Prefl calibration points
+	uint8_t  Pin_nr;			// Nr of  Pin calibration points	
+	
+	uint16_t Pfwrd_ADC[NrOfPowerCalibrationPoints];       // Array of ADC's calibration values
+	float    Pfwrd_ADC2W_RC[NrOfPowerCalibrationPoints-1];  // Array of RC's corresponding to ADC calibration values
+	float    Pfwrd_ADC2W_B[NrOfPowerCalibrationPoints-1];   // Array of B's corresponding to ADC calibration values
+
+	uint16_t Prefl_ADC[NrOfPowerCalibrationPoints];       // Array of ADC's calibration values
+	float    Prefl_ADC2W_RC[NrOfPowerCalibrationPoints-1];  // Array of RC's corresponding to ADC calibration values
+	float Prefl_ADC2W_B[NrOfPowerCalibrationPoints-1];   // Array of B's corresponding to ADC calibration values
+	
+	uint16_t Pin_ADC[NrOfPowerCalibrationPoints];       // Array of ADC's calibration values
+	float    Pin_ADC2W_RC[NrOfPowerCalibrationPoints-1];  // Array of RC's corresponding to ADC calibration values
+	float Pin_ADC2W_B[NrOfPowerCalibrationPoints-1];   // Array of B's corresponding to ADC calibration values
+
+	uint16_t Pfwrd_W[NrOfPowerCalibrationPoints];       // Array of W's calibration values
+	float    Pfwrd_W2ADC_RC[NrOfPowerCalibrationPoints-1];  // Array of RC's corresponding to W calibration values
+	float Pfwrd_W2ADC_B[NrOfPowerCalibrationPoints-1];   // Array of B's corresponding to W calibration values
+
+	uint16_t Prefl_W[NrOfPowerCalibrationPoints];       // Array of W's calibration values
+	float    Prefl_W2ADC_RC[NrOfPowerCalibrationPoints-1];  // Array of RC's corresponding to W calibration values
+	float Prefl_W2ADC_B[NrOfPowerCalibrationPoints-1];   // Array of B's corresponding to W calibration values
+
+	uint16_t Pin_W[NrOfPowerCalibrationPoints];       // Array of W's calibration values
+	float    Pin_W2ADC_RC[NrOfPowerCalibrationPoints-1];  // Array of RC's corresponding to W calibration values
+	float Pin_W2ADC_B[NrOfPowerCalibrationPoints-1];   // Array of B's corresponding to W calibration values
+} calPowerValuesStruct;
+
 
 enum activeMenus {Imod_menu, Pall_menu, Gen_Menu, Temp_menu};
 	
@@ -166,6 +198,7 @@ extern tempValuesStruct temp_values;
 extern adcValuesStruct adc_values;
 extern currentValuesStruct current;  // calibrated I current values
 extern powerValuesStruct power;      //calibrated P values
+extern calPowerValuesStruct calPower_values;
 
 extern enum activeMenus activeMenu;
 extern enum activeMenus nextMenu;
@@ -197,5 +230,6 @@ extern uint8_t controlConnected;
 /* EEPROM global values */
 extern tripValuesStruct EEMEM EEtrip_values;
 extern calValuesStruct EEMEM EEcal_values;
+extern calPowerValuesStruct EEMEM EEcalPower_values;
 
 #endif /* generalDefine_H_ */

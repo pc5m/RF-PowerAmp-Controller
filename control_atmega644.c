@@ -135,7 +135,6 @@ void set_PSU(unsigned char on) {
 
 void set_ERROR(unsigned char on)
 {
-	set_LEDerror(ON);
 	if (on)
 	{
 		bit_set(SSPAstatus,BIT(FLAG_ERROR));
@@ -252,6 +251,63 @@ void set_cal_powers_adc2w(uint8_t powerID, float val) {
 	}
 } //set_cal_powers_adc2w(uint8_t powerID, float val)
 
+// Get the uint16_t corresponds with linear interpolation using y = rc * x + b. Used RC and B determined based on array position.
+// nrOfVals = number of datapoints in xArray.
+uint16_t Interpolate (uint16_t x, uint16_t *xArray, float *RCArray, float *BArray, uint8_t nrOfVals){
+	uint8_t i;
+	for (i = nrOfVals-2; i > 0 ; i--)
+	{
+		if (x >= xArray[i] ) break;
+	}
+	return(RCArray[i]*x+BArray[i]);
+}
+
+// set_cal_powers_adc2w (uint8_t powerID, message) - set calibration values for power, ADC to Watt conversion in memory and in EEPROM
+// Input: powerID: ID of the calibration power to be set, message: Calibration points and 
+
+void set_powerCalibrationADC2W_RC_B(uint8_t powerID, uint8_t NrOfCalibrationPoints, uint16_t *xArray, float *RCArray, float *BArray){
+	switch (powerID)
+	{
+	case POWER_FWD:  
+		calPower_values.Pfwrd_nr = NrOfCalibrationPoints; 
+		 // eeprom_update_float(&EEcalPower_values.Pfwrd_nr, NrOfCalibrationPoints); break;
+		 uint8_t i;
+		for (i = 0; i < 5 ; i++)
+		{
+			calPower_values.Pfwrd_ADC[i] = xArray[i];
+		}
+		for (i = 0; i < 4 ; i++)
+		{
+			calPower_values.Pfwrd_ADC2W_B[i] = BArray[i];
+			calPower_values.Pfwrd_ADC2W_RC[i] = RCArray[i];
+		}
+		break;
+	default : break;
+	}
+}
+
+//void set_powerCalibrationADC2W_RC_B(uint8_t *MyArray){
+	//switch (MyArray[0])
+	//{
+		//case POWER_FWD:
+		//calPower_values.Pfwrd_nr = 4;
+		////calPower_values.Pfwrd_ADC[0] = (uint16_t) MyArray[2];
+		//calPower_values.Pfwrd_ADC[0] = 50;
+		////uint8_t i;
+		////for (i = 0; i < 4 ; i++)
+		////{
+			////calPower_values.Pfwrd_ADC[i] = MyArray[i];
+		////}
+		////for (i = 0; i < 3 ; i++)
+		////{
+			////calPower_values.Pfwrd_ADC2W_B[i] = MyArray[i];
+			////calPower_values.Pfwrd_ADC2W_RC[i] = MyArray[i];
+		////}
+		//break;
+		//default : break;
+	//}
+//}
+
 void SSPA_IO_init(void) {
 	// define BIAS_ENABLE, LED_TX, LED_ERROR,PSU_ENABLE as output and set all to defined state 
 	set_LEDerror(OFF);  // led error is off
@@ -280,11 +336,14 @@ void CalculateCurrents(void)
 // ADC and full calibration data should be available when entering this routine
 void CalculatePowerAndSWR(void)
 {
-	power.fwrd = cal_values.Pfwrd_ADC2W * adc_values.pwrFwrd_ADC;
+	//power.fwrd = cal_values.Pfwrd_ADC2W * adc_values.pwrFwrd_ADC;
+    power.fwrd = Interpolate(adc_values.pwrFwrd_ADC, calPower_values.Pfwrd_ADC, calPower_values.Pfwrd_ADC2W_RC, calPower_values.Pfwrd_ADC2W_B,calPower_values.Pfwrd_nr);
 	power.refl = cal_values.Prefl_ADC2W * adc_values.pwrRefl_ADC;
 	power.input = cal_values.Pin_ADC2W * adc_values.pwrIn_ADC;
 	power.swr = 1.6; // todo: calculate swr with sqrt
 }
+
+
 
 
 	
@@ -380,6 +439,7 @@ void loadEEpromVals()
 {
 	eeprom_read_block(&trip_values, &EEtrip_values, sizeof(EEtrip_values));
 	eeprom_read_block(&cal_values, &EEcal_values, sizeof(EEcal_values));
+	eeprom_read_block(&calPower_values, &EEcalPower_values, sizeof(EEcalPower_values));
 }
 
 void ProcessSerialCommunication() 
@@ -474,10 +534,10 @@ int main(void)
 			activeMenu = nextMenu;
 			display_Bargraph(activeMenu);
 			
-			if (get_ptt() == ON)
-			     set_TX(ON);
-			else 
-                 set_TX(OFF);	
+			//if (get_ptt() == ON)
+			//set_TX(ON);
+			//else
+			//set_TX(OFF);
 				 	
 			if (button_pressed() == TRUE) nextMenu = nextActiveMenu();
 

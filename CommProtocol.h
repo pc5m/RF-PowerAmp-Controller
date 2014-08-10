@@ -53,6 +53,11 @@
 #define PC_ID_SET_STATUS_AUTOTX_TEMP     		23
 #define PC_ID_REQ_TEMP_TRIP						24
 #define PC_ID_SET_TEMP_TRIP						25
+#define PC_ID_SET_CAL_POWERS_W2ADC_RC_B			26	
+#define PC_ID_SET_CAL_POWERS_ADC2W_RC_B			27
+#define PC_ID_REQ_CAL_POWERS_W2ADC_RC_B			28
+#define PC_ID_REQ_CAL_POWERS_ADC2W_RC_B			29
+
 
 /* IDs sent from MC to PC */
 #define MC_ID_STATUS				0
@@ -71,12 +76,15 @@
 #define MC_ID_TEMPERATURE			13
 #define MC_ID_TEMPERATURE_TRIP		14
 #define MC_ID_FW_VERSION			15
+#define MC_ID_POWER_CAL_ADC2W_RC_B	16
+#define MC_ID_POWER_CAL_W2ADC_RC_B  17
+
 
 
 typedef volatile struct{
 	uint8_t id;
 	uint8_t dlc;
-	uint8_t data[16];  // maximum length of received messages excluding EOFSYNC
+	uint8_t data[64];  // maximum length of received messages excluding EOFSYNC
 }Com_Message_struct;
 
 
@@ -105,6 +113,9 @@ extern void uart_tx_powerTripADC();
 extern void uart_tx_powerTripVals();
 extern void uart_tx_powerCalibrationADC2W();
 extern void uart_tx_powerCalibrationW2ADC();
+
+extern void uart_tx_powerCalibrationADC2W_RC_B(uint8_t);
+extern void uart_tx_powerCalibrationW2ADC_RC_B(uint8_t);
 
 extern void uart_tx_status();  // status of TX/RX, PSU On/Off, Error/Trip
 
