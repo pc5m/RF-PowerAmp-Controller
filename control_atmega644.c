@@ -265,13 +265,13 @@ uint16_t Interpolate (uint16_t x, uint16_t *xArray, float *RCArray, float *BArra
 // set_cal_powers_adc2w (uint8_t powerID, message) - set calibration values for power, ADC to Watt conversion in memory and in EEPROM
 // Input: powerID: ID of the calibration power to be set, message: Calibration points and 
 
-void set_powerCalibrationADC2W_RC_B(uint8_t powerID, uint8_t NrOfCalibrationPoints, uint16_t *xArray, float *RCArray, float *BArray){
+void set_powerCalibrationADC2W_RC_B(uint8_t powerID, uint8_t NrOfCalibrationPoints, uint16_t* xArray, float* RCArray, float* BArray){
+	uint8_t i;
 	switch (powerID)
 	{
 	case POWER_FWD:  
 		calPower_values.Pfwrd_nr = NrOfCalibrationPoints; 
-		 // eeprom_update_float(&EEcalPower_values.Pfwrd_nr, NrOfCalibrationPoints); break;
-		 uint8_t i;
+		 // eeprom_update_float(&EEcalPower_values.Pfwrd_nr, NrOfCalibrationPoints); 
 		for (i = 0; i < 5 ; i++)
 		{
 			calPower_values.Pfwrd_ADC[i] = xArray[i];
@@ -280,6 +280,32 @@ void set_powerCalibrationADC2W_RC_B(uint8_t powerID, uint8_t NrOfCalibrationPoin
 		{
 			calPower_values.Pfwrd_ADC2W_B[i] = BArray[i];
 			calPower_values.Pfwrd_ADC2W_RC[i] = RCArray[i];
+		}
+		break;
+	case POWER_REFL:
+		calPower_values.Prefl_nr = NrOfCalibrationPoints;
+		// eeprom_update_float(&EEcalPower_values.Prefl_nr, NrOfCalibrationPoints); 
+		for (i = 0; i < 5 ; i++)
+		{
+			calPower_values.Prefl_ADC[i] = xArray[i];
+		}
+		for (i = 0; i < 4 ; i++)
+		{
+			calPower_values.Prefl_ADC2W_B[i] = BArray[i];
+			calPower_values.Prefl_ADC2W_RC[i] = RCArray[i];
+		}
+		break;
+	case POWER_IN:
+		calPower_values.Pin_nr = NrOfCalibrationPoints;
+		// eeprom_update_float(&EEcalPower_values.Pin_nr, NrOfCalibrationPoints); 
+		for (i = 0; i < 5 ; i++)
+		{
+			calPower_values.Pin_ADC[i] = xArray[i];
+		}
+		for (i = 0; i < 4 ; i++)
+		{
+			calPower_values.Pin_ADC2W_B[i] = BArray[i];
+			calPower_values.Pin_ADC2W_RC[i] = RCArray[i];
 		}
 		break;
 	default : break;
@@ -336,10 +362,10 @@ void CalculateCurrents(void)
 // ADC and full calibration data should be available when entering this routine
 void CalculatePowerAndSWR(void)
 {
-	//power.fwrd = cal_values.Pfwrd_ADC2W * adc_values.pwrFwrd_ADC;
     power.fwrd = Interpolate(adc_values.pwrFwrd_ADC, calPower_values.Pfwrd_ADC, calPower_values.Pfwrd_ADC2W_RC, calPower_values.Pfwrd_ADC2W_B,calPower_values.Pfwrd_nr);
-	power.refl = cal_values.Prefl_ADC2W * adc_values.pwrRefl_ADC;
-	power.input = cal_values.Pin_ADC2W * adc_values.pwrIn_ADC;
+	power.refl = Interpolate(adc_values.pwrRefl_ADC, calPower_values.Prefl_ADC, calPower_values.Prefl_ADC2W_RC, calPower_values.Prefl_ADC2W_B,calPower_values.Prefl_nr);
+	power.input = Interpolate(adc_values.pwrIn_ADC, calPower_values.Pin_ADC, calPower_values.Pin_ADC2W_RC, calPower_values.Pin_ADC2W_B,calPower_values.Pin_nr);
+	
 	power.swr = 1.6; // todo: calculate swr with sqrt
 }
 
@@ -398,19 +424,19 @@ void temperature()
 */
 unsigned char button_pressed(void) {
 	static int pressedCounter, releasedCounter;
-	static bool pressed, released;
+	static bool pressed; //, released;
 	if (get_button() == TRUE) pressedCounter++; else releasedCounter++;
 	if (pressedCounter > 10) {
        releasedCounter = 0;
 	   pressedCounter = 10;
 	   pressed = TRUE;
-	   released = FALSE;
+//	   released = FALSE;
 	}
 	if (releasedCounter > 10) {
 		releasedCounter = 10;
 		pressedCounter = 0;
 		if (pressed == TRUE) {
-			released = TRUE;
+//			released = TRUE;
 			pressed = FALSE;
 			return (TRUE);
 		}
@@ -473,6 +499,7 @@ int main(void)
 {
 	uint16_t temperatureCounterDisplay = 0;
 	uint8_t errorNotCancelled = TRUE;
+	uint16_t errorDisplayRateIndex = 0;
 	MCUCR=(1<<JTD); // disable JTAG on portC
 	MCUCR=(1<<JTD); // disable JTAG on portC
     SSPA_IO_init();      // initialize unit: BIAS = OFF, PSU = ON, RX STAT;
@@ -514,12 +541,16 @@ int main(void)
 			    set_ERROR(ON);
 				display_error();
 				errorNotCancelled = TRUE;
-				while(errorNotCancelled)    //continue to display error on error menu, until menu button pressed 
+				while(errorNotCancelled)    //continue to display error on error menu, until menu button pressed  
 				{
 					adc_GetData();
 					CalculateCurrents();
 					CalculatePowerAndSWR();
-					display_error();
+					errorDisplayRateIndex++; //slow down error refresh rate, to get better display (due to clear screen) 
+					if (errorDisplayRateIndex >= 100) {
+						display_error();   
+						errorDisplayRateIndex = 0;
+					}
 					ProcessSerialCommunication(); //if connected than transmit serial data
 					if (button_pressed() == TRUE) 
 					{
@@ -534,10 +565,10 @@ int main(void)
 			activeMenu = nextMenu;
 			display_Bargraph(activeMenu);
 			
-			//if (get_ptt() == ON)
-			//set_TX(ON);
-			//else
-			//set_TX(OFF);
+			if (get_ptt() == ON)
+				set_TX(ON);
+			else
+				set_TX(OFF);
 				 	
 			if (button_pressed() == TRUE) nextMenu = nextActiveMenu();
 

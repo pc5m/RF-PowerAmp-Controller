@@ -532,11 +532,10 @@ void uart_tx_powerCalibrationADC2W(){
 /*************************************************************************
 Function: uart_tx_powerCalibrationADC2W_RC_B()
 Purpose:  Transmit the ADC to Powercalibration factors via UART new format
-Input:    none
+Input:    uint8_t, requested power type (POWER_FWD, POWER_REFL or POWER_IN)
 Returns:  none
 **************************************************************************/
 void uart_tx_powerCalibrationADC2W_RC_B(uint8_t powerID){
-	set_TX(ON);
 	#define BYTES 44 // bytes 1 to 44
 	uint8_t txBuffer[BYTES+5];
 	uint8_t i;
@@ -554,13 +553,24 @@ void uart_tx_powerCalibrationADC2W_RC_B(uint8_t powerID){
         memcpy(&txBuffer[16],&calPower_values.Pfwrd_ADC2W_RC,16);  // 4 * float
 		memcpy(&txBuffer[32],&calPower_values.Pfwrd_ADC2W_B,16);	// 4 * float
 		break;
+	case POWER_REFL:
+		txBuffer[5] = calPower_values.Prefl_nr;
+		memcpy(&txBuffer[6],&calPower_values.Prefl_ADC,10);  // 5 *  uint16_t
+		memcpy(&txBuffer[16],&calPower_values.Prefl_ADC2W_RC,16);  // 4 * float
+		memcpy(&txBuffer[32],&calPower_values.Prefl_ADC2W_B,16);	// 4 * float
+	break;
+	case POWER_IN:
+		txBuffer[5] = calPower_values.Pin_nr;
+		memcpy(&txBuffer[6],&calPower_values.Pin_ADC,10);  // 5 *  uint16_t
+		memcpy(&txBuffer[16],&calPower_values.Pin_ADC2W_RC,16);  // 4 * float
+		memcpy(&txBuffer[32],&calPower_values.Pin_ADC2W_B,16);	// 4 * float
+	break;
 	}
 	txBuffer[BYTES+4] = EOFSYNC;
 	for (i=0;i<=BYTES+4;i++)
 	{
 		uart_putc(txBuffer[i]);
 	}
-	set_TX(OFF);
 }
 
 
