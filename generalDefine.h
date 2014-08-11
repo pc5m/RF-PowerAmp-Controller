@@ -46,7 +46,6 @@
 #define bit_write(c,p,m) (c ? bit_set(p,m) : bit_clear(p,m))
 
 #define ConvertTo_float(b1,b2,b3,b4) (float)(((b1)<<24)|((b2)<<16)|((b3)<<8)|(b4))
-// convertTo_uint16(MSB, LSB)
 #define ConvertTo_uint16(b1,b2) (uint16_t)(((b1)<<8)|(b2))
 
 /*
@@ -126,17 +125,12 @@ typedef struct {
 
 	uint16_t Pfwrd_max_ADC;  // ADC value  ? maximum forward power [W]
 	uint16_t Pfwrd_max_W;    // maximum value of power, used in display
-	float    Pfwrd_ADC2W; 	 // factor to convert ADC value to forward power  [W]
-	float    Pfwrd_W2ADC;	 // factor to convert forward power  [W] to ADC value
 
 	uint16_t  Prefl_max_ADC; // ADC value  ? maximum forward power [W]
 	uint16_t  Prefl_max_W;   // maximum value of power, used in display
-	float     Prefl_ADC2W; 	 // factor to convert ADC value to reflected power  [W]
-	float     Prefl_W2ADC;	 // factor to convert reflected power  [W] to ADC value
+
 	uint16_t  Pin_max_ADC;   // ADC value  ? maximum forward power [W]
 	uint16_t  Pin_max_W; 	 // maximum value of power, used in display
-	float     Pin_ADC2W;     // factor to convert ADC value to input power [W]
-	float     Pin_W2ADC;     // factor to convert input power  [W] to ADC value
 } calValuesStruct;
 
 #define NrOfPowerCalibrationPoints 5

@@ -98,13 +98,9 @@ void comm_RX_process(void)
 					case  PC_ID_SET_STATUS_AUTOTX_POWERS_VALS:  if (Com_Message_Rx.data[0] == TRUE) autoTransmitPowerVals = TRUE; else autoTransmitPowerVals = FALSE; break;
 					case  PC_ID_REQ_POWERS_TRIP_ADC: uart_tx_powerTripADC(); break;
 					case  PC_ID_REQ_POWERS_TRIP_VALS: uart_tx_powerTripVals(); break;
-					case  PC_ID_REQ_CAL_POWERS_W2ADC: uart_tx_powerCalibrationW2ADC(); break;
-					case  PC_ID_REQ_CAL_POWERS_ADC2W: uart_tx_powerCalibrationADC2W(); break;
 					case  PC_ID_SET_POWERS_TRIP_ADC: set_trip_powers_adc(Com_Message_Rx.data[0],*(uint16_t *)&Com_Message_Rx.data[1]); break;
 					case  PC_ID_SET_POWERS_TRIP_VAL: set_trip_powers_val(Com_Message_Rx.data[0],*(uint16_t *)&Com_Message_Rx.data[1]); break;
-				    case  PC_ID_SET_SWR_TRIP_VAL: set_trip_swr_val(*(float *)&Com_Message_Rx.data[0]); break;
-					case  PC_ID_SET_CAL_POWERS_W2ADC: set_cal_powers_w2adc(Com_Message_Rx.data[0],*(float *)&(Com_Message_Rx.data[1])); break;
-					case  PC_ID_SET_CAL_POWERS_ADC2W: set_cal_powers_adc2w(Com_Message_Rx.data[0],*(float *)&(Com_Message_Rx.data[1])); break;
+					case  PC_ID_SET_SWR_TRIP_VAL: set_trip_swr_val(*(float *)&Com_Message_Rx.data[0]); break;
 					case  PC_ID_SET_STATUS_AUTOTX_TEMP: if (Com_Message_Rx.data[0] == TRUE) autoTransmitTemperature = TRUE; else autoTransmitTemperature = FALSE; break;
 					case  PC_ID_REQ_TEMP_TRIP: uart_tx_temperatureTrip(); break;
 					case  PC_ID_SET_TEMP_TRIP: set_trip_temperature(Com_Message_Rx.data[0]); break;	
@@ -470,7 +466,7 @@ void uart_tx_powerTripVals(){
 }
 
 /*************************************************************************
-Function: uart_tx_powerCalibrationADC2W()
+Function: uart_tx_powerVals()
 Purpose:  Transmit the power values incl. swr via UART as 4 times 4 bytes (float)
 Input:    none
 Returns:  none
@@ -501,35 +497,6 @@ void uart_tx_powerVals(){
 
 
 /*************************************************************************
-Function: uart_tx_powerCalibrationADC2W()
-Purpose:  Transmit the ADC to Powercalibration factors via UART as 3 times 4 bytes (float)
-Input:    none
-Returns:  none
-**************************************************************************/
-void uart_tx_powerCalibrationADC2W(){
-	#define BYTES 12 // nr of bytes 3 * 4;
-	uint8_t txBuffer[BYTES+5];
-	uint8_t i;
-	unsigned char *p;
-	txBuffer[0] = SOF;
-	txBuffer[1] = SYNC;
-	txBuffer[2] = MC_ID_POWER_CAL_ADC2W;
-	txBuffer[3] = BYTES;
-	p = (unsigned char *)&cal_values.Pfwrd_ADC2W;
-	for(i=0; i<4; i++){ txBuffer[4+i] = *p++ ;}
-	p = (unsigned char *)&cal_values.Prefl_ADC2W;
-	for(i=0; i<4; i++){ txBuffer[8+i] = *p++ ;}
-	p = (unsigned char *)&cal_values.Pin_ADC2W;
-	for(i=0; i<4; i++){ txBuffer[12+i] = *p++ ;}
-	txBuffer[BYTES+4] = EOFSYNC;
-	for (i=0;i<=BYTES+4;i++)
-	{
-		uart_putc(txBuffer[i]);
-	}
-}
-
-
-/*************************************************************************
 Function: uart_tx_powerCalibrationADC2W_RC_B()
 Purpose:  Transmit the ADC to Powercalibration factors via UART new format
 Input:    uint8_t, requested power type (POWER_FWD, POWER_REFL or POWER_IN)
@@ -539,7 +506,7 @@ void uart_tx_powerCalibrationADC2W_RC_B(uint8_t powerID){
 	#define BYTES 44 // bytes 1 to 44
 	uint8_t txBuffer[BYTES+5];
 	uint8_t i;
-	unsigned char *p;
+	// unsigned char *p;
 	txBuffer[0] = SOF;
 	txBuffer[1] = SYNC;
 	txBuffer[2] = MC_ID_POWER_CAL_ADC2W_RC_B;
@@ -566,36 +533,6 @@ void uart_tx_powerCalibrationADC2W_RC_B(uint8_t powerID){
 		memcpy(&txBuffer[32],&calPower_values.Pin_ADC2W_B,16);	// 4 * float
 	break;
 	}
-	txBuffer[BYTES+4] = EOFSYNC;
-	for (i=0;i<=BYTES+4;i++)
-	{
-		uart_putc(txBuffer[i]);
-	}
-}
-
-
-
-/*************************************************************************
-Function: uart_tx_powerCalibrationW2ADC()
-Purpose:  Transmit the Power to ADC calibration factors via UART as 3 times 4 bytes (float)
-Input:    none
-Returns:  none
-**************************************************************************/
-void uart_tx_powerCalibrationW2ADC(){
-	#define BYTES 12 // nr of bytes 3 * 4;
-	uint8_t txBuffer[BYTES+5];
-	uint8_t i;
-	unsigned char *p;
-	txBuffer[0] = SOF;
-	txBuffer[1] = SYNC;
-	txBuffer[2] = MC_ID_POWER_CAL_W2ADC;
-	txBuffer[3] = BYTES;
-	p = (unsigned char *)&cal_values.Pfwrd_W2ADC;
-	for(i=0; i<4; i++){ txBuffer[4+i] = *p++ ;}
-	p = (unsigned char *)&cal_values.Prefl_W2ADC;
-	for(i=0; i<4; i++){ txBuffer[8+i] = *p++ ;}
-	p = (unsigned char *)&cal_values.Pin_W2ADC;
-	for(i=0; i<4; i++){ txBuffer[12+i] = *p++ ;}
 	txBuffer[BYTES+4] = EOFSYNC;
 	for (i=0;i<=BYTES+4;i++)
 	{

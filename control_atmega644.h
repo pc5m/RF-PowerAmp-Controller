@@ -20,13 +20,13 @@ extern void set_cal_currents_adc2amp (uint8_t,float);
 
 extern void set_trip_powers_val (uint8_t,uint16_t);
 extern void set_trip_powers_adc (uint8_t,uint16_t);
-extern void set_cal_powers_w2adc (uint8_t,float);
-extern void set_cal_powers_adc2w (uint8_t,float);
+//extern void set_cal_powers_w2adc (uint8_t,float);
+//extern void set_cal_powers_adc2w (uint8_t,float);
 
 extern void set_trip_swr_val (float);
 extern void set_powerCalibrationADC2W_RC_B(uint8_t, uint8_t, uint16_t* , float*, float*);
 // extern void set_powerCalibrationADC2W_RC_B(uint8_t*);
 
-extern void set_TX (unsigned char);
+// extern void set_TX (unsigned char);
 
 #endif /* CONTROL_ATMEGA644_H_ */

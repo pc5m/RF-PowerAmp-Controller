@@ -46,16 +46,12 @@
 #define PC_ID_SET_POWERS_TRIP_ADC				16
 #define PC_ID_SET_POWERS_TRIP_VAL				17
 #define PC_ID_SET_SWR_TRIP_VAL				    18
-#define PC_ID_SET_CAL_POWERS_W2ADC				19
-#define PC_ID_SET_CAL_POWERS_ADC2W				20
-#define PC_ID_REQ_CAL_POWERS_W2ADC				21
-#define PC_ID_REQ_CAL_POWERS_ADC2W				22
 #define PC_ID_SET_STATUS_AUTOTX_TEMP     		23
 #define PC_ID_REQ_TEMP_TRIP						24
 #define PC_ID_SET_TEMP_TRIP						25
-#define PC_ID_SET_CAL_POWERS_W2ADC_RC_B			26	
+// #define PC_ID_SET_CAL_POWERS_W2ADC_RC_B			26	
 #define PC_ID_SET_CAL_POWERS_ADC2W_RC_B			27
-#define PC_ID_REQ_CAL_POWERS_W2ADC_RC_B			28
+// #define PC_ID_REQ_CAL_POWERS_W2ADC_RC_B			28
 #define PC_ID_REQ_CAL_POWERS_ADC2W_RC_B			29
 
 
@@ -111,11 +107,9 @@ extern void uart_tx_powerVals();
 extern void uart_tx_powerADCVals();
 extern void uart_tx_powerTripADC();
 extern void uart_tx_powerTripVals();
-extern void uart_tx_powerCalibrationADC2W();
-extern void uart_tx_powerCalibrationW2ADC();
 
 extern void uart_tx_powerCalibrationADC2W_RC_B(uint8_t);
-extern void uart_tx_powerCalibrationW2ADC_RC_B(uint8_t);
+// extern void uart_tx_powerCalibrationW2ADC_RC_B(uint8_t);
 
 extern void uart_tx_status();  // status of TX/RX, PSU On/Off, Error/Trip
 

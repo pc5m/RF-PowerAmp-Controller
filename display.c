@@ -22,6 +22,15 @@ volatile static const PROGMEM unsigned char BargraphElements[] =
 };
 
 
+void display_welcomeMessage()
+{
+    display_textLine(1,welcomeLine1);
+	display_textLine(2,welcomeLine2);
+	display_textLine(3,welcomeLine3);
+	display_textLine(4,welcomeLine4);
+}
+
+
 void display_InitBargraph()
 {
 	uint8_t i;
@@ -95,7 +104,7 @@ void display_Menu (enum activeMenus menu)
 	{
 	case Gen_Menu:
 			display_FormattedLine(1,"P  ",power.fwrd,4,0," W ");
-			display_FormattedLine(2,"SWR 1:",power.swr,1,0,"   ");
+			display_FormattedLine(2,"SWR 1:",power.swr,1,1,"  ");
 			display_FormattedLine(3,"I  ",current.moduleTotal,3,0," A  ");
 			
 			display_FormattedLine(4,"T  ",temp_values.tempMax,3,0," C  ");  //should be maximum temperature = todo !
@@ -105,7 +114,7 @@ void display_Menu (enum activeMenus menu)
 			display_FormattedLine(1,"FWD ",power.fwrd,4,0," W");
 			display_FormattedLine(2,"REF ",power.refl,3,0," W ");
 			display_FormattedLine(3,"INP ",power.input,4,1," W");
-			display_FormattedLine(4,"SWR 1:",power.swr,1,0,"   ");
+			display_FormattedLine(4,"SWR 1:",power.swr,1,1,"  ");
 			activeMenu = Pall_menu;
 		break;
 	case Temp_menu:
@@ -206,67 +215,67 @@ void display_error ()
 	switch (activeError)
 	{
 	case ImodA:
-            display_textLine(1,"ERROR:CURRENT MOD A TRIPPED");
+            display_textLine(1,"ERROR: CURRENT MOD A");
 			display_FormattedLine(2,"IA:",current.moduleA,4,1," A");
 			display_FormattedLine(3,"IA Trip:  ",trip_values.ImodA_trip_ADC * cal_values.ImodA_ADC2AMP,4,1," A");
 			display_textLine(4,"ON-OFF TO RESUME");
 			break;
 	case ImodB:
-			display_textLine(1,"ERROR:CURRENT MOD B TRIPPED");
+			display_textLine(1,"ERROR: CURRENT MOD B ");
 			display_FormattedLine(2,"IB:",current.moduleB,4,1," A");
 			display_FormattedLine(3,"IB Trip:  ",trip_values.ImodB_trip_ADC * cal_values.ImodB_ADC2AMP,4,1," A");
 			display_textLine(4,"ON-OFF TO RESUME");
 			break;
 	case ImodC:
-			display_textLine(1,"ERROR:CURRENT MOD C TRIPPED");
+			display_textLine(1,"ERROR: CURRENT MOD C ");
 			display_FormattedLine(2,"IC:",current.moduleC,4,1," A");
 			display_FormattedLine(3,"IC Trip:  ",trip_values.ImodC_trip_ADC * cal_values.ImodC_ADC2AMP,4,1," A");
 			display_textLine(4,"ON-OFF TO RESUME");
 			break;	
 	case ImodD:
-			display_textLine(1,"ERROR:CURRENT MOD D TRIPPED");
+			display_textLine(1,"ERROR: CURRENT MOD D ");
 			display_FormattedLine(2,"ID:",current.moduleD,4,1," A");
 			display_FormattedLine(3,"ID Trip:  ",trip_values.ImodD_trip_ADC * cal_values.ImodD_ADC2AMP,4,1," A");
 			display_textLine(4,"ON-OFF TO RESUME");
 			break;
 	case Pfwrd:
-			display_textLine(1,"ERROR:POWER OUTPUT TRIPPED");
+			display_textLine(1,"ERROR: POWER FORWARD ");
 			display_FormattedLine(2,"P FWRD :",power.fwrd,4,0," W");
 			display_FormattedLine(3,"P FWRD Trip:  ",trip_values.Pfwrd_trip_W,4,0," W");
 			display_textLine(4,"ON-OFF TO RESUME");
 			break;
 	case Prefl:
-			display_textLine(1,"ERROR:POWER REFLECTED TRIPPED");
+			display_textLine(1,"ERROR: POWER REFL   ");
 			display_FormattedLine(2,"P REFL:",power.refl,4,0," W");
 			display_FormattedLine(3,"P REFL Trip: ",trip_values.Prefl_trip_W,4,0," W");
 			display_textLine(4,"ON-OFF TO RESUME");
 			break;
 	case Pin:
-			display_textLine(1,"*** P-IN TRIPPED ***");
+			display_textLine(1,"ERROR: POWER INPUT  ");
 			display_FormattedLine(2,"P INP: ",power.input,4,1," W");
 			display_FormattedLine(3,"P INP Trip: ",trip_values.Pin_trip_W,4,1," W");
 			display_textLine(4,"ON-OFF TO RESUME");
 			break;
 	case TempA:
-			display_textLine(1,"ERROR:TEMP MOD A TRIPPED");
+			display_textLine(1,"ERROR: TEMP MOD A   ");
 			display_FormattedLine(2,"T A:",temp_values.tempA,2,0," C");
 			display_FormattedLine(3,"T A Trip: ",trip_values.temp_trip,2,0," C");
 			display_textLine(4,"ON-OFF TO RESUME");
 			break;
 	case TempB:
-			display_textLine(1,"ERROR:TEMP MOD B TRIPPED");
+			display_textLine(1,"ERROR: TEMP MOD B   ");
 			display_FormattedLine(2,"T B:",temp_values.tempB,2,0," C");
 			display_FormattedLine(3,"T B Trip: ",trip_values.temp_trip,2,0," C");
 			display_textLine(4,"ON-OFF TO RESUME");
 	break;
 	case TempC:
-			display_textLine(1,"ERROR:TEMP MOD C TRIPPED");
+			display_textLine(1,"ERROR: TEMP MOD C   ");
 			display_FormattedLine(2,"T C:",temp_values.tempC,2,0," C");
 			display_FormattedLine(3,"T C Trip: ",trip_values.temp_trip,2,0," C");
 			display_textLine(4,"ON-OFF TO RESUME");
 	break;
 	case TempD:
-			display_textLine(1,"ERROR:TEMP MOD D TRIPPED");
+			display_textLine(1,"ERROR: TEMP MOD D   ");
 			display_FormattedLine(2,"T D:",temp_values.tempD,2,0," C");
 			display_FormattedLine(3,"T D Trip: ",trip_values.temp_trip,2,0," C");
 			display_textLine(4,"ON-OFF TO RESUME");

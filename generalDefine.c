@@ -23,18 +23,13 @@ calValuesStruct EEcal_values = {
 
 		.Pfwrd_max_ADC = 1024,
 		.Pfwrd_max_W   = 1200,
-		.Pfwrd_ADC2W   = 1.171875,
-		.Pfwrd_W2ADC   = 0.853,
 
 		.Prefl_max_ADC = 1024,
 		.Prefl_max_W   = 100,
-		.Prefl_ADC2W   = 0.0977,
-		.Prefl_W2ADC   = 10.24,
 
 		.Pin_max_ADC   = 1024,
-		.Pin_max_W     = 10,
-		.Pin_ADC2W     = 0.00978,
-		.Pin_W2ADC     = 102.4 };
+		.Pin_max_W     = 10
+		};
 		
 		
 calPowerValuesStruct calPower_values;  //No defaults set, default will be read from EEPROM on startup 		

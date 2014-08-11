@@ -227,29 +227,6 @@ void set_trip_powers_adc(uint8_t powerID, uint16_t val) {
 	}
 } // set_trip_powers_adc(uint8_t powerID, uint16_t val)
 
-// set calibration values for power, Watt to ADC conversion in memory and in EEPROM
-// Input: powerID: ID of the calibration power to be set, val: Watt to ADC  value to be set			
-void set_cal_powers_w2adc(uint8_t powerID, float val) {
-	switch (powerID)
-	{
-		case POWER_FWD:  cal_values.Pfwrd_W2ADC = val; eeprom_update_float(&EEcal_values.Pfwrd_W2ADC, val); break;
-		case POWER_REFL: cal_values.Prefl_W2ADC = val; eeprom_update_float(&EEcal_values.Prefl_W2ADC, val); break;
-		case POWER_IN:   cal_values.Pin_W2ADC = val;   eeprom_update_float(&EEcal_values.Pin_W2ADC, val);   break;
-		default: break;
-	}
-} // set_cal_powers_w2adc(uint8_t powerID, float val)
-
-// set_cal_powers_adc2w (uint8_t powerID, float val) - set calibration values for power, ADC to Watt conversion in memory and in EEPROM
-// Input: powerID: ID of the calibration power to be set, val: ADC to Watt value to be set	    
-void set_cal_powers_adc2w(uint8_t powerID, float val) {
-	switch (powerID)
-	{
-		case POWER_FWD:  cal_values.Pfwrd_ADC2W = val; eeprom_update_float(&EEcal_values.Pfwrd_ADC2W, val); break;
-		case POWER_REFL: cal_values.Prefl_ADC2W = val; eeprom_update_float(&EEcal_values.Prefl_ADC2W, val); break;
-	    case POWER_IN:   cal_values.Pin_ADC2W = val;   eeprom_update_float(&EEcal_values.Pin_ADC2W, val);   break;
-		default: break;
-	}
-} //set_cal_powers_adc2w(uint8_t powerID, float val)
 
 // Get the uint16_t corresponds with linear interpolation using y = rc * x + b. Used RC and B determined based on array position.
 // nrOfVals = number of datapoints in xArray.
@@ -264,81 +241,67 @@ uint16_t Interpolate (uint16_t x, uint16_t *xArray, float *RCArray, float *BArra
 
 // set_cal_powers_adc2w (uint8_t powerID, message) - set calibration values for power, ADC to Watt conversion in memory and in EEPROM
 // Input: powerID: ID of the calibration power to be set, message: Calibration points and 
-
 void set_powerCalibrationADC2W_RC_B(uint8_t powerID, uint8_t NrOfCalibrationPoints, uint16_t* xArray, float* RCArray, float* BArray){
 	uint8_t i;
 	switch (powerID)
 	{
 	case POWER_FWD:  
 		calPower_values.Pfwrd_nr = NrOfCalibrationPoints; 
-		 // eeprom_update_float(&EEcalPower_values.Pfwrd_nr, NrOfCalibrationPoints); 
+		eeprom_update_byte(&EEcalPower_values.Pfwrd_nr, NrOfCalibrationPoints); 
 		for (i = 0; i < 5 ; i++)
 		{
 			calPower_values.Pfwrd_ADC[i] = xArray[i];
+			eeprom_update_word(&EEcalPower_values.Pfwrd_ADC[i], xArray[i]); 
 		}
 		for (i = 0; i < 4 ; i++)
 		{
 			calPower_values.Pfwrd_ADC2W_B[i] = BArray[i];
+			eeprom_update_float(&EEcalPower_values.Pfwrd_ADC2W_B[i], BArray[i]); 
 			calPower_values.Pfwrd_ADC2W_RC[i] = RCArray[i];
+			eeprom_update_float(&EEcalPower_values.Pfwrd_ADC2W_RC[i], RCArray[i]); 
 		}
 		break;
 	case POWER_REFL:
 		calPower_values.Prefl_nr = NrOfCalibrationPoints;
-		// eeprom_update_float(&EEcalPower_values.Prefl_nr, NrOfCalibrationPoints); 
+		eeprom_update_byte(&EEcalPower_values.Prefl_nr, NrOfCalibrationPoints); 
 		for (i = 0; i < 5 ; i++)
 		{
 			calPower_values.Prefl_ADC[i] = xArray[i];
+			eeprom_update_word(&EEcalPower_values.Prefl_ADC[i], xArray[i]); 
 		}
 		for (i = 0; i < 4 ; i++)
 		{
 			calPower_values.Prefl_ADC2W_B[i] = BArray[i];
 			calPower_values.Prefl_ADC2W_RC[i] = RCArray[i];
+			eeprom_update_float(&EEcalPower_values.Prefl_ADC2W_B[i], BArray[i]); 
+			eeprom_update_float(&EEcalPower_values.Prefl_ADC2W_RC[i], RCArray[i]);
 		}
 		break;
 	case POWER_IN:
 		calPower_values.Pin_nr = NrOfCalibrationPoints;
-		// eeprom_update_float(&EEcalPower_values.Pin_nr, NrOfCalibrationPoints); 
+		eeprom_update_byte(&EEcalPower_values.Pin_nr, NrOfCalibrationPoints); 
 		for (i = 0; i < 5 ; i++)
 		{
 			calPower_values.Pin_ADC[i] = xArray[i];
+			eeprom_update_word(&EEcalPower_values.Pin_ADC[i], xArray[i]); 
 		}
 		for (i = 0; i < 4 ; i++)
 		{
 			calPower_values.Pin_ADC2W_B[i] = BArray[i];
-			calPower_values.Pin_ADC2W_RC[i] = RCArray[i];
+			calPower_values.Pin_ADC2W_RC[i] = RCArray[i];			
+			eeprom_update_float(&EEcalPower_values.Pin_ADC2W_B[i], BArray[i]);
+			eeprom_update_float(&EEcalPower_values.Pin_ADC2W_RC[i], RCArray[i]);
 		}
 		break;
 	default : break;
 	}
 }
 
-//void set_powerCalibrationADC2W_RC_B(uint8_t *MyArray){
-	//switch (MyArray[0])
-	//{
-		//case POWER_FWD:
-		//calPower_values.Pfwrd_nr = 4;
-		////calPower_values.Pfwrd_ADC[0] = (uint16_t) MyArray[2];
-		//calPower_values.Pfwrd_ADC[0] = 50;
-		////uint8_t i;
-		////for (i = 0; i < 4 ; i++)
-		////{
-			////calPower_values.Pfwrd_ADC[i] = MyArray[i];
-		////}
-		////for (i = 0; i < 3 ; i++)
-		////{
-			////calPower_values.Pfwrd_ADC2W_B[i] = MyArray[i];
-			////calPower_values.Pfwrd_ADC2W_RC[i] = MyArray[i];
-		////}
-		//break;
-		//default : break;
-	//}
-//}
-
 void SSPA_IO_init(void) {
 	// define BIAS_ENABLE, LED_TX, LED_ERROR,PSU_ENABLE as output and set all to defined state 
 	set_LEDerror(OFF);  // led error is off
 	set_TX(OFF); // PA bias is disabled, led tx is off (RX state), Coax relais TX off (rx state)
-	set_PSU(ON);        // Enable powersupply
+	set_PSU(OFF);        // Disable powersupply
 	bit_set(DDRB, ( BIT(REL_TX) | BIT (BIAS_ENABLE) | BIT(LED_TX) | BIT (LED_ERROR) ) );
 	bit_set(DDRD, BIT (PSU_ENABLE) ) ;
 	// define PTT_IN and OVERLOAD_IN, BUTTON_IN as input enable pull up resistors
@@ -362,11 +325,15 @@ void CalculateCurrents(void)
 // ADC and full calibration data should be available when entering this routine
 void CalculatePowerAndSWR(void)
 {
+
     power.fwrd = Interpolate(adc_values.pwrFwrd_ADC, calPower_values.Pfwrd_ADC, calPower_values.Pfwrd_ADC2W_RC, calPower_values.Pfwrd_ADC2W_B,calPower_values.Pfwrd_nr);
 	power.refl = Interpolate(adc_values.pwrRefl_ADC, calPower_values.Prefl_ADC, calPower_values.Prefl_ADC2W_RC, calPower_values.Prefl_ADC2W_B,calPower_values.Prefl_nr);
 	power.input = Interpolate(adc_values.pwrIn_ADC, calPower_values.Pin_ADC, calPower_values.Pin_ADC2W_RC, calPower_values.Pin_ADC2W_B,calPower_values.Pin_nr);
 	
 	power.swr = 1.6; // todo: calculate swr with sqrt
+	float w;
+	w = sqrt(power.refl/power.fwrd);
+	power.swr = (1+w)/(1-w);
 }
 
 
@@ -375,10 +342,10 @@ void CalculatePowerAndSWR(void)
 	
 enum ErrorStates CheckForError(void)
 { 
-	// if (adc_values.iModuleA_ADC > trip_values.ImodA_trip_ADC) return (ImodA);
-	// if (adc_values.iModuleB_ADC > trip_values.ImodB_trip_ADC) return (ImodB);
-	// if (adc_values.iModuleC_ADC > trip_values.ImodC_trip_ADC) return (ImodC);
-	// if (adc_values.iModuleD_ADC > trip_values.ImodD_trip_ADC) return (ImodD);
+	if (adc_values.iModuleA_ADC > trip_values.ImodA_trip_ADC) return (ImodA);
+	if (adc_values.iModuleB_ADC > trip_values.ImodB_trip_ADC) return (ImodB);
+	if (adc_values.iModuleC_ADC > trip_values.ImodC_trip_ADC) return (ImodC);
+	if (adc_values.iModuleD_ADC > trip_values.ImodD_trip_ADC) return (ImodD);
 	
 	if (adc_values.pwrFwrd_ADC > trip_values.Pfwrd_trip_ADC) return (Pfwrd);
 	if (adc_values.pwrRefl_ADC > trip_values.Prefl_trip_ADC) return (Prefl);
@@ -456,10 +423,10 @@ enum activeMenus nextActiveMenu(){
 	return(Pall_menu);  //should never be reached, to keep compiler happy
 }//nextActiveMenu()
 
-void SetErrorState()
-{
-
-}
+//void SetErrorState()
+//{
+//
+//}
 
 void loadEEpromVals() 
 {
@@ -495,6 +462,8 @@ void ProcessSerialCommunication()
 
 
 
+
+
 int main(void)
 {
 	uint16_t temperatureCounterDisplay = 0;
@@ -506,7 +475,6 @@ int main(void)
 	loadEEpromVals();
 	lcd_init(LCD_DISP_ON);
 	display_InitBargraph();
-	lcd_clrscr();
 	adc_init();
 	lm75_init();
 	uart_init( UART_BAUD_SELECT(UART_BAUD_RATE,F_CPU) ); 
@@ -515,6 +483,10 @@ int main(void)
 	nextMenu = Gen_Menu;
 	temperature(); // get temperature
 	comm_tx_version();
+	display_welcomeMessage();
+	_delay_ms(4000);
+	lcd_clrscr();
+	set_PSU(ON);
 	while(TRUE)
     {
 		   //-	Get ADC input vals for power measurements

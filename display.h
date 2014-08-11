@@ -12,6 +12,11 @@
 #ifndef DISPLAY_H_
 #define DISPLAY_H_
 
+#define welcomeLine1  "                    "
+#define welcomeLine2  "SSPA CONTROLLER V0.9"
+#define welcomeLine3  "   PC5M/PA0V 2014   "
+#define welcomeLine4  "                    "
+
 /**
  @brief    Display float without auto linefeed
  @param    float to be displayed with width (max 10) and nr of digits                                       
@@ -61,5 +66,13 @@ extern void display_InitBargraph();
  @return   none
 */
 extern void display_Bargraph (enum activeMenus menu);
+
+
+/**
+ @brief    Display welcome message
+ @param    none                    
+ @return   none
+*/
+extern void display_welcomeMessage();
 
 #endif /* DISPLAY_H_ */
