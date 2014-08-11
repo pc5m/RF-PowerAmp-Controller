@@ -9,6 +9,8 @@
 
 // define global variable;
 
+
+
 calValuesStruct cal_values;  //No defaults set, default will be read from EEPROM on startup 
 	
 calValuesStruct EEcal_values = {
@@ -124,3 +126,5 @@ uint8_t controlConnected = FALSE;
 uint8_t autoTransmitPowerADC  = FALSE;
 uint8_t autoTransmitCurrentADC  = FALSE;
 uint8_t autoTransmitTemperature  = FALSE;
+
+uint16_t decay = 250; // 250 standard decay value, to be overridden at startup (holding menu button)

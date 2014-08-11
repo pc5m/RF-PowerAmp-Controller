@@ -7,13 +7,15 @@
 
 #include "adc.h"
 #include "generalDefine.h"
-#include <avr/sfr_defs.h> // for looop_until_bit_clear
+#include <avr/sfr_defs.h> // for loop_until_bit_clear
 #include <avr/io.h>
+
+
 
 void adc_init()
 {
 	// External reference at AREF pin
-	// Devide by 128 for 144KHz clock
+	// Divide by 128 for 144KHz clock
 	// Single conversion, Enable ADC
 	// Disable digital input on ADC input pins
 	bit_set(ADCSRA,BIT(ADPS0) | BIT(ADPS1) | BIT(ADPS2) );
@@ -34,8 +36,29 @@ static uint16_t adc_read(void)
 	return (ADCW);
 }
 
+
+uint16_t adc_peakhold (uint16_t newADC, uint16_t* lastMaxADC, uint16_t* DecayCounter, const uint16_t Decay)
+{
+	if (newADC > *lastMaxADC){
+		*DecayCounter = 0;
+		*lastMaxADC = newADC;	
+	} 
+	else {
+		(*DecayCounter)++;
+		if (*DecayCounter > Decay) {
+			*DecayCounter = Decay;
+			*lastMaxADC = newADC;
+		}
+	}
+	return (*lastMaxADC);
+}
+
 void adc_GetData()
 {
+	static uint16_t pwrIn_ADC_lastmax, pwrIn_ADC_decayCounter;
+	static uint16_t pwrFwrd_ADC_lastmax, pwrFwrd_ADC_decayCounter;
+	static uint16_t pwrPrefl_ADC_lastmax, pwrPrefl_ADC_decayCounter;
+	
 	adc_select(ADC_ImodA);
 	adc_values.iModuleA_ADC = adc_read();
 	adc_select(ADC_ImodB);
@@ -45,10 +68,13 @@ void adc_GetData()
 	adc_select(ADC_ImodD);
 	adc_values.iModuleD_ADC = adc_read();
 	adc_select(ADC_Pfwd);
-	adc_values.pwrFwrd_ADC = adc_read();
+	//adc_values.pwrFwrd_ADC = adc_read();
+	adc_values.pwrFwrd_ADC = adc_peakhold( adc_read(), &pwrFwrd_ADC_lastmax, &pwrFwrd_ADC_decayCounter, decay);
 	adc_select(ADC_Prefl);
-	adc_values.pwrRefl_ADC = adc_read();
+	//adc_values.pwrRefl_ADC = adc_read();
+	adc_values.pwrRefl_ADC = adc_peakhold( adc_read(), &pwrPrefl_ADC_lastmax, &pwrPrefl_ADC_decayCounter, decay);
 	adc_select(ADC_Pin);
-	adc_values.pwrIn_ADC = adc_read();
+	//adc_values.pwrIn_ADC = adc_read();
+	adc_values.pwrIn_ADC = adc_peakhold( adc_read(), &pwrIn_ADC_lastmax, &pwrIn_ADC_decayCounter, decay);
 }
 

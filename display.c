@@ -104,9 +104,8 @@ void display_Menu (enum activeMenus menu)
 	{
 	case Gen_Menu:
 			display_FormattedLine(1,"P  ",power.fwrd,4,0," W ");
-			display_FormattedLine(2,"SWR 1:",power.swr,1,1,"  ");
+			if (power.swr == 999) display_textLine(2,"SWR ----    "); else  display_FormattedLine(2,"SWR 1:",power.swr,1,1,"  ");
 			display_FormattedLine(3,"I  ",current.moduleTotal,3,0," A  ");
-			
 			display_FormattedLine(4,"T  ",temp_values.tempMax,3,0," C  ");  //should be maximum temperature = todo !
 			activeMenu = Gen_Menu;
 		break;
@@ -114,7 +113,8 @@ void display_Menu (enum activeMenus menu)
 			display_FormattedLine(1,"FWD ",power.fwrd,4,0," W");
 			display_FormattedLine(2,"REF ",power.refl,3,0," W ");
 			display_FormattedLine(3,"INP ",power.input,4,1," W");
-			display_FormattedLine(4,"SWR 1:",power.swr,1,1,"  ");
+			if (power.swr == 999) display_textLine(4,"SWR ----    "); else  display_FormattedLine(4,"SWR 1:",power.swr,1,1,"  ");
+			// display_FormattedLine(4,"SWR 1:",power.swr,1,1,"  ");
 			activeMenu = Pall_menu;
 		break;
 	case Temp_menu:
@@ -191,7 +191,6 @@ void display_Bargraph (enum activeMenus menu)
 			display_Bar(1,adc_values.pwrFwrd_ADC,trip_values.Pfwrd_trip_ADC);
 			display_Bar(2,adc_values.pwrRefl_ADC,trip_values.Prefl_trip_ADC);
 			display_Bar(3,adc_values.pwrIn_ADC,trip_values.Pin_trip_ADC);
-			// display_FormattedLine(4,"SWR 1:",power.swr,1,0,"   ");
 			break;
 	case Imod_menu:
 	    	display_Bar(1,adc_values.iModuleA_ADC,trip_values.ImodA_trip_ADC);
@@ -278,6 +277,12 @@ void display_error ()
 			display_textLine(1,"ERROR: TEMP MOD D   ");
 			display_FormattedLine(2,"T D:",temp_values.tempD,2,0," C");
 			display_FormattedLine(3,"T D Trip: ",trip_values.temp_trip,2,0," C");
+			display_textLine(4,"ON-OFF TO RESUME");
+	break;
+	case SWR:
+			display_textLine(1,"ERROR: SWR          ");
+			if (power.swr == 999) display_textLine(2,"SWR ----    "); else  display_FormattedLine(2,"SWR 1:",power.swr,1,1,"  ");
+			display_FormattedLine(3,"SWR Trip 1:",trip_values.swr_trip,1,1," ");
 			display_textLine(4,"ON-OFF TO RESUME");
 	break;
 	default: 

@@ -214,6 +214,8 @@ extern uint8_t SSPAstatus;   // status with flags
 #define POWER_IN   2
 #define POWER_SWR  3
 
+extern uint16_t decay;
+
 extern uint8_t autoTransmitCurrentVals;
 extern uint8_t autoTransmitCurrentADC;
 extern uint8_t autoTransmitPowerVals;

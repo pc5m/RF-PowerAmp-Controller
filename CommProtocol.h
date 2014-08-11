@@ -46,6 +46,7 @@
 #define PC_ID_SET_POWERS_TRIP_ADC				16
 #define PC_ID_SET_POWERS_TRIP_VAL				17
 #define PC_ID_SET_SWR_TRIP_VAL				    18
+// #define PC_ID_REQ_SWR_TRIP_VAL				    19
 #define PC_ID_SET_STATUS_AUTOTX_TEMP     		23
 #define PC_ID_REQ_TEMP_TRIP						24
 #define PC_ID_SET_TEMP_TRIP						25
@@ -66,8 +67,8 @@
 #define MC_ID_POWER_ADC_VALS		7
 #define MC_ID_POWER_TRIP_ADC		8
 #define MC_ID_POWER_TRIP_VALS		9
-#define MC_ID_POWER_CAL_ADC2W		10
-#define MC_ID_POWER_CAL_W2ADC		11
+#define MC_ID_SWR_TRIP_VAL  		10
+// #define MC_ID_POWER_CAL_W2ADC		11
 #define MC_ID_POWER_VALS			12
 #define MC_ID_TEMPERATURE			13
 #define MC_ID_TEMPERATURE_TRIP		14

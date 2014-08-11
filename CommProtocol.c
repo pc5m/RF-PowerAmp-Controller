@@ -444,7 +444,7 @@ Input:    none
 Returns:  none
 **************************************************************************/
 void uart_tx_powerTripVals(){
-	#define BYTES 6
+	#define BYTES 10
 	uint8_t txBuffer[BYTES+5];
 	uint8_t i;
 	unsigned char *p;
@@ -458,6 +458,8 @@ void uart_tx_powerTripVals(){
 	for(i=0; i<2; i++){ txBuffer[6+i] = *p++ ;}
 	p = (unsigned char *)&trip_values.Pin_trip_W;
 	for(i=0; i<2; i++){ txBuffer[8+i] = *p++ ;}
+	p = (unsigned char *)&trip_values.swr_trip;
+	for(i=0; i<4; i++){ txBuffer[10+i] = *p++ ;}
 	txBuffer[BYTES+4] = EOFSYNC;
 	for (i=0;i<=BYTES+4;i++)
 	{

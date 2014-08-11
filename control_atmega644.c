@@ -222,7 +222,7 @@ void set_trip_powers_adc(uint8_t powerID, uint16_t val) {
 		case POWER_FWD:  trip_values.Pfwrd_trip_ADC = val; eeprom_update_word(&EEtrip_values.Pfwrd_trip_ADC, val); break;
 		case POWER_REFL: trip_values.Prefl_trip_ADC = val; eeprom_update_word(&EEtrip_values.Prefl_trip_ADC, val); break;
 		case POWER_IN:   trip_values.Pin_trip_ADC = val;   eeprom_update_word(&EEtrip_values.Pin_trip_ADC, val);   break;
-		case POWER_SWR:  trip_values.SWR_trip_ADC = val;   eeprom_update_word(&EEtrip_values.SWR_trip_ADC, val);   break;
+		// case POWER_SWR:  trip_values.SWR_trip_ADC = val;   eeprom_update_word(&EEtrip_values.SWR_trip_ADC, val);   break;
 		default: break;
 	}
 } // set_trip_powers_adc(uint8_t powerID, uint16_t val)
@@ -330,10 +330,12 @@ void CalculatePowerAndSWR(void)
 	power.refl = Interpolate(adc_values.pwrRefl_ADC, calPower_values.Prefl_ADC, calPower_values.Prefl_ADC2W_RC, calPower_values.Prefl_ADC2W_B,calPower_values.Prefl_nr);
 	power.input = Interpolate(adc_values.pwrIn_ADC, calPower_values.Pin_ADC, calPower_values.Pin_ADC2W_RC, calPower_values.Pin_ADC2W_B,calPower_values.Pin_nr);
 	
-	power.swr = 1.6; // todo: calculate swr with sqrt
-	float w;
-	w = sqrt(power.refl/power.fwrd);
-	power.swr = (1+w)/(1-w);
+    if (power.fwrd > 100){
+		float w;
+		w = sqrt(power.refl/power.fwrd);
+		if (w > 0.9) w = 0.9; // limit swr to 1 : 19
+		power.swr = (1+w)/(1-w);
+	} else power.swr = 999;   // used later to not display SWR when Forward power is too low.
 }
 
 
@@ -350,7 +352,8 @@ enum ErrorStates CheckForError(void)
 	if (adc_values.pwrFwrd_ADC > trip_values.Pfwrd_trip_ADC) return (Pfwrd);
 	if (adc_values.pwrRefl_ADC > trip_values.Prefl_trip_ADC) return (Prefl);
 	if (adc_values.pwrIn_ADC   > trip_values.Pin_trip_ADC)   return (Pin);
-	// todo trip value for SWR ?
+	
+	if ((power.swr > trip_values.swr_trip) && (power.swr != 999)) return (SWR);
 	
 	// Check for trip temperature, in case sensor not attached: temp returned = 255;
     // TODO: Temperature below 0 degree not correct !
@@ -483,8 +486,9 @@ int main(void)
 	nextMenu = Gen_Menu;
 	temperature(); // get temperature
 	comm_tx_version();
+	if (get_button() == TRUE) decay = 0; //no peak hold when menu button is pressed at startup
 	display_welcomeMessage();
-	_delay_ms(4000);
+	_delay_ms(3000);
 	lcd_clrscr();
 	set_PSU(ON);
 	while(TRUE)
