@@ -14,7 +14,7 @@
 
 #define welcomeLine1  "                    "
 #define welcomeLine2  "    144 MHz SSPA    "
-#define welcomeLine3  "   PC5M/PA0V 2014   "
+#define welcomeLine3  "  PC5M / PA0V 2014  "
 #define welcomeLine4  "                    "
 
 /**
@@ -53,7 +53,7 @@ extern void display_Menu (enum activeMenus menu);
 extern void display_error ();
 
 /**
- @brief    Prepare for using bargrpaphs
+ @brief    Prepare for using bargraphs
  @param    none                                        
  @return   none
 */

@@ -9,10 +9,9 @@
 
 // define global variable;
 
-
-
 calValuesStruct cal_values;  //No defaults set, default will be read from EEPROM on startup 
 	
+//Defaults only used when not yet calibration is performed via client application	
 calValuesStruct EEcal_values = {
 		.ImodA_ADC2AMP = 0.0145,
 		.ImodA_AMP2ADC = 68.266,
@@ -33,9 +32,9 @@ calValuesStruct EEcal_values = {
 		.Pin_max_W     = 10
 		};
 		
-		
 calPowerValuesStruct calPower_values;  //No defaults set, default will be read from EEPROM on startup 		
-		
+
+//Defaults only used when not yet calibration is performed via client application		
 calPowerValuesStruct EEcalPower_values = {
 	.Pfwrd_nr = 5,		// Nr of  Pforwards calibration points
     .Prefl_nr = 5,			// Nr of  Prefl calibration points
@@ -68,7 +67,8 @@ calPowerValuesStruct EEcalPower_values = {
 		
 	
 tripValuesStruct trip_values;  //No defaults set, default will be read from EEPROM on startup
-	
+
+//Defaults only used when not yet calibration is performed via client application	
 tripValuesStruct EEtrip_values = {
 		.ImodA_trip_ADC = 820,  // ADC value ? trip current [A]
 		.ImodB_trip_ADC = 820,  // ADC value ? trip current [A]
@@ -85,6 +85,7 @@ tripValuesStruct EEtrip_values = {
 		.swr_trip       = 2,    // SWR  trip value
 		.temp_trip      = 50 };   // temperature trip  value [?C]
 
+
 tempValuesStruct temp_values = {
 	.tempA = 25, 
 	.tempB = 26, 
@@ -92,7 +93,6 @@ tempValuesStruct temp_values = {
 	.tempD = 28,
 	.tempMax = 28 };
 
-//Raw ADC current mod A
 adcValuesStruct adc_values = {
 	.iModuleA_ADC = 500, 
 	.iModuleB_ADC = 600, 
@@ -121,10 +121,10 @@ enum ErrorStates activeError = NoError;
 uint8_t SSPAstatus = 0;
 
 uint8_t autoTransmitCurrentVals = FALSE;
-uint8_t autoTransmitPowerVals = FALSE;
-uint8_t controlConnected = FALSE;
-uint8_t autoTransmitPowerADC  = FALSE;
+uint8_t autoTransmitPowerVals   = FALSE;
+uint8_t controlConnected        = FALSE;
+uint8_t autoTransmitPowerADC    = FALSE;
 uint8_t autoTransmitCurrentADC  = FALSE;
-uint8_t autoTransmitTemperature  = FALSE;
+uint8_t autoTransmitTemperature = FALSE;
 
 uint16_t decay = 250; // 250 standard decay value, to be overridden at startup (holding menu button)

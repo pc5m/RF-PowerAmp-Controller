@@ -6,8 +6,8 @@
  */ 
 
 
-#ifndef COMMPROTOCOL_H_
-#define COMMPROTOCOL_H_
+#ifndef COMM_H_
+#define COMM_H_
 
 #include <inttypes.h>
 
@@ -116,4 +116,4 @@ extern void comm_uart_tx_status();  // status of TX/RX, PSU On/Off, Error/Trip
 
 
 
-#endif /* COMMPROTOCOL_H_ */
+#endif /* COMM_H_ */

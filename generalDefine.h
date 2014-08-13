@@ -9,33 +9,23 @@
 #ifndef generalDefine_H_
 #define generalDefine_H_
 
-/*************************************************************************
- Title	:   C include file general define's and macro's
- Author:    Carel Mobach
- File:	    $Id: generalDefine.h,v 1.0.0.0 2013/12/10 14:22:00 $
- Software:  AVR-GCC 4.5.1
- Hardware:  ATMEGA644
-***************************************************************************/
-
-/**
- 
- @brief Basic routines 
-      
- @author Carel Mobach
-
-*/
 
 #include <stdint.h>
 #include <avr/eeprom.h>
 
+/*
+** constants/macros
+*/
+
 #define FW_VERSION_NR 1
 #define F_CPU 18432000UL      /*18,432 MHz external oscillator */
+
+#define NrOfPowerCalibrationPoints 5
 
 #define ON 1
 #define OFF 0
 #define TRUE 1
 #define FALSE 0
-
 
 
 #define bit_get(p,m) ((p) & (m))
@@ -48,17 +38,31 @@
 #define ConvertTo_float(b1,b2,b3,b4) (float)(((b1)<<24)|((b2)<<16)|((b3)<<8)|(b4))
 #define ConvertTo_uint16(b1,b2) (uint16_t)(((b1)<<8)|(b2))
 
-/*
-** constants/macros
-*/
+
 #define DDR(x) (*(&x - 1))    /* address of data direction register of port x */
 #define PIN(x) (*(&x - 2))    /* address of input register of port x          */
 #define PORT(x) (x)
 
+#define FLAG_ERROR   7
+#define FLAG_TX_ON   6
+#define FLAG_PSU_ON  5
+#define FLAG_BIAS_ON 4
+
+#define MODULE_A 0
+#define MODULE_B 1
+#define MODULE_C 2
+#define MODULE_D 3
+
+#define POWER_FWD  0
+#define POWER_REFL 1
+#define POWER_IN   2
+#define POWER_SWR  3
+
 /*
-** global variables
+** type definitions
 */
 
+// structure holding all ADC values 
 typedef struct {
 	uint16_t iModuleA_ADC;
 	uint16_t iModuleB_ADC;
@@ -69,6 +73,7 @@ typedef struct {
 	uint16_t pwrIn_ADC;
 } adcValuesStruct;
 
+// structure holding the module currents values [A]
 typedef struct {
 	float moduleA;
 	float moduleB;
@@ -77,6 +82,7 @@ typedef struct {
 	float moduleTotal;
 } currentValuesStruct;
 
+// structure holding the power and SWR values
 typedef struct {
 	float fwrd;
 	float refl;
@@ -84,6 +90,7 @@ typedef struct {
 	float swr;
 } powerValuesStruct;
 
+// structure holding the temperature values 
 typedef struct
 {
 	uint8_t tempA;
@@ -93,6 +100,7 @@ typedef struct
 	uint8_t tempMax;
 }  tempValuesStruct;
 
+// structure holding the trip values (ADC as well as real value)
 typedef struct {
 	uint16_t ImodA_trip_ADC; // ADC value ? trip current [A]
 	uint16_t ImodB_trip_ADC; // ADC value ? trip current [A]
@@ -110,6 +118,7 @@ typedef struct {
 	uint8_t  temp_trip;      // temperature trip  value [?C]
 } tripValuesStruct;
 
+// structure holding the calibration factors for currents
 typedef struct {
 	float    ImodA_ADC2AMP;  // factor to convert  ADC value to current in [A]
 	float    ImodA_AMP2ADC;  // factor to convert current [A] to ADC value
@@ -133,38 +142,41 @@ typedef struct {
 	uint16_t  Pin_max_W; 	 // maximum value of power, used in display
 } calValuesStruct;
 
-#define NrOfPowerCalibrationPoints 5
-
+// structure holding the calibration factors for powers
 typedef struct {
 	uint8_t  Pfwrd_nr;			// Nr of  Pforwards calibration points
 	uint8_t  Prefl_nr;			// Nr of  Prefl calibration points
 	uint8_t  Pin_nr;			// Nr of  Pin calibration points	
 	
-	uint16_t Pfwrd_ADC[NrOfPowerCalibrationPoints];       // Array of ADC's calibration values
-	float    Pfwrd_ADC2W_RC[NrOfPowerCalibrationPoints-1];  // Array of RC's corresponding to ADC calibration values
-	float    Pfwrd_ADC2W_B[NrOfPowerCalibrationPoints-1];   // Array of B's corresponding to ADC calibration values
+	uint16_t Pfwrd_ADC[NrOfPowerCalibrationPoints];        // Array of ADC's calibration values (forward power)
+	float    Pfwrd_ADC2W_RC[NrOfPowerCalibrationPoints-1]; // Array of RC's corresponding to ADC calibration values (forward power)
+	float    Pfwrd_ADC2W_B[NrOfPowerCalibrationPoints-1];  // Array of B's corresponding to ADC calibration values (forward power)
 
-	uint16_t Prefl_ADC[NrOfPowerCalibrationPoints];       // Array of ADC's calibration values
-	float    Prefl_ADC2W_RC[NrOfPowerCalibrationPoints-1];  // Array of RC's corresponding to ADC calibration values
-	float Prefl_ADC2W_B[NrOfPowerCalibrationPoints-1];   // Array of B's corresponding to ADC calibration values
+	uint16_t Prefl_ADC[NrOfPowerCalibrationPoints];        // Array of ADC's calibration values (reflected power)
+	float    Prefl_ADC2W_RC[NrOfPowerCalibrationPoints-1]; // Array of RC's corresponding to ADC calibration values (reflected power)
+	float Prefl_ADC2W_B[NrOfPowerCalibrationPoints-1];     // Array of B's corresponding to ADC calibration values (reflected power)
 	
-	uint16_t Pin_ADC[NrOfPowerCalibrationPoints];       // Array of ADC's calibration values
-	float    Pin_ADC2W_RC[NrOfPowerCalibrationPoints-1];  // Array of RC's corresponding to ADC calibration values
-	float Pin_ADC2W_B[NrOfPowerCalibrationPoints-1];   // Array of B's corresponding to ADC calibration values
+	uint16_t Pin_ADC[NrOfPowerCalibrationPoints];          // Array of ADC's calibration values (input power)
+	float    Pin_ADC2W_RC[NrOfPowerCalibrationPoints-1];   // Array of RC's corresponding to ADC calibration values (input power)
+	float Pin_ADC2W_B[NrOfPowerCalibrationPoints-1];       // Array of B's corresponding to ADC calibration values (input power)
 
-	uint16_t Pfwrd_W[NrOfPowerCalibrationPoints];       // Array of W's calibration values
-	float    Pfwrd_W2ADC_RC[NrOfPowerCalibrationPoints-1];  // Array of RC's corresponding to W calibration values
-	float Pfwrd_W2ADC_B[NrOfPowerCalibrationPoints-1];   // Array of B's corresponding to W calibration values
+	uint16_t Pfwrd_W[NrOfPowerCalibrationPoints];          // Array of W's calibration values (forward power) 
+	float    Pfwrd_W2ADC_RC[NrOfPowerCalibrationPoints-1]; // Array of RC's corresponding to W calibration values (forward power)
+	float Pfwrd_W2ADC_B[NrOfPowerCalibrationPoints-1];     // Array of B's corresponding to W calibration values (forward power)
 
-	uint16_t Prefl_W[NrOfPowerCalibrationPoints];       // Array of W's calibration values
-	float    Prefl_W2ADC_RC[NrOfPowerCalibrationPoints-1];  // Array of RC's corresponding to W calibration values
-	float Prefl_W2ADC_B[NrOfPowerCalibrationPoints-1];   // Array of B's corresponding to W calibration values
+	uint16_t Prefl_W[NrOfPowerCalibrationPoints];          // Array of W's calibration values (reflected power)
+	float    Prefl_W2ADC_RC[NrOfPowerCalibrationPoints-1]; // Array of RC's corresponding to W calibration values (reflected power)
+	float Prefl_W2ADC_B[NrOfPowerCalibrationPoints-1];     // Array of B's corresponding to W calibration values (reflected power)
 
-	uint16_t Pin_W[NrOfPowerCalibrationPoints];       // Array of W's calibration values
-	float    Pin_W2ADC_RC[NrOfPowerCalibrationPoints-1];  // Array of RC's corresponding to W calibration values
-	float Pin_W2ADC_B[NrOfPowerCalibrationPoints-1];   // Array of B's corresponding to W calibration values
+	uint16_t Pin_W[NrOfPowerCalibrationPoints];            // Array of W's calibration values (input power)
+	float    Pin_W2ADC_RC[NrOfPowerCalibrationPoints-1];   // Array of RC's corresponding to W calibration values (input power)
+	float Pin_W2ADC_B[NrOfPowerCalibrationPoints-1];       // Array of B's corresponding to W calibration values (input power)
 } calPowerValuesStruct;
 
+
+/*
+** Enumerations
+*/
 
 enum activeMenus {Imod_menu, Pall_menu, Gen_Menu, Temp_menu};
 	
@@ -185,47 +197,35 @@ enum ErrorStates {
 	TempD   = 12 } ;
 	
 	
-// declare global variable;
-extern calValuesStruct cal_values;
-extern tripValuesStruct trip_values;
-extern tempValuesStruct temp_values;
-extern adcValuesStruct adc_values;
-extern currentValuesStruct current;  // calibrated I current values
-extern powerValuesStruct power;      //calibrated P values
-extern calPowerValuesStruct calPower_values;
+/*
+** global variables
+*/
+extern calValuesStruct cal_values;    //calibration factors for currents
+extern tripValuesStruct trip_values;  //trip values
+extern tempValuesStruct temp_values;  //temperature values
+extern adcValuesStruct adc_values;    //raw ADC values for all inputs
+extern currentValuesStruct current;   // calibrated I current values
+extern powerValuesStruct power;       //calibrated P values
+extern calPowerValuesStruct calPower_values; //calibration factors for power and SWR
 
 extern enum activeMenus activeMenu;
 extern enum activeMenus nextMenu;
 extern enum ErrorStates activeError;
 
-extern uint8_t SSPAstatus;   // status with flags
-#define FLAG_ERROR   7
-#define FLAG_TX_ON   6
-#define FLAG_PSU_ON  5
-#define FLAG_BIAS_ON 4
+extern uint8_t SSPAstatus;   // SSPA status with flags
 
-#define MODULE_A 0
-#define MODULE_B 1
-#define MODULE_C 2
-#define MODULE_D 3
+extern uint16_t decay;       // Decay factor for peak hold
 
-#define POWER_FWD  0
-#define POWER_REFL 1
-#define POWER_IN   2
-#define POWER_SWR  3
-
-extern uint16_t decay;
-
-extern uint8_t autoTransmitCurrentVals;
-extern uint8_t autoTransmitCurrentADC;
-extern uint8_t autoTransmitPowerVals;
-extern uint8_t autoTransmitPowerADC;
-extern uint8_t autoTransmitTemperature;
-extern uint8_t controlConnected;
+extern uint8_t autoTransmitCurrentVals;  //when set, current values are transmitted regularly via serial port
+extern uint8_t autoTransmitCurrentADC;   //when set, current ADC values are transmitted regularly via serial port
+extern uint8_t autoTransmitPowerVals;    //when set, power values are transmitted regularly via serial port
+extern uint8_t autoTransmitPowerADC;     //when set, power ADC values are transmitted regularly via serial port
+extern uint8_t autoTransmitTemperature;  //when set, temperature values are transmitted regularly via serial port
+extern uint8_t controlConnected;         //when set, SSPA is connected to client application
 
 /* EEPROM global values */
-extern tripValuesStruct EEMEM EEtrip_values;
-extern calValuesStruct EEMEM EEcal_values;
-extern calPowerValuesStruct EEMEM EEcalPower_values;
+extern tripValuesStruct EEMEM EEtrip_values;         //trip values as stored in local EEPROM
+extern calValuesStruct EEMEM EEcal_values;           //calibration values for current as stored in local EEPROM
+extern calPowerValuesStruct EEMEM EEcalPower_values; //calibration values for power as stored in local EEPROM
 
 #endif /* generalDefine_H_ */

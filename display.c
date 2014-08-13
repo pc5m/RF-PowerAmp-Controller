@@ -11,6 +11,7 @@
 
 #define BARGRAPH_COUNT 9 //nr of full bargraph's
 
+// user defined data to be stored in display's RAM, defines the different bargraph symbols 
 volatile static const PROGMEM unsigned char BargraphElements[] =
 {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0F,
@@ -21,16 +22,25 @@ volatile static const PROGMEM unsigned char BargraphElements[] =
 	0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F
 };
 
-
+/*************************************************************************
+Display's welcome message upon startup
+Input:    none
+Returns:  none
+*************************************************************************/
 void display_welcomeMessage()
 {
     display_textLine(1,welcomeLine1);
 	display_textLine(2,welcomeLine2);
 	display_textLine(3,welcomeLine3);
 	display_textLine(4,welcomeLine4);
-}
+}/* display_welcomeMessageh */
 
 
+/*************************************************************************
+Initialize display, uploads bargraph elements
+Input:    none
+Returns:  none
+*************************************************************************/
 void display_InitBargraph()
 {
 	uint8_t i;
@@ -39,7 +49,7 @@ void display_InitBargraph()
 	{
 		lcd_data(pgm_read_byte_near(&BargraphElements[i]));
 	}
-}
+}/* display_InitBargraph */
 
 
 /*************************************************************************
@@ -77,7 +87,6 @@ void display_FormattedLine (uint8_t line, char *preamble,float f_value, uint8_t 
 }/* lcd_formattedLine */
 
 
-
 /*************************************************************************
 Display text string at line position 1 - 4 
 Input:   line = line nr (first line is line 1
@@ -92,11 +101,11 @@ void display_textLine (uint8_t line, char *text)
 
 
 
-/**
- @brief    Display menu
- @param    menu to be displayed                                        
- @return   none
-*/
+/*************************************************************************
+Display current menu
+Input:   menu : menu to be displayed
+Returns:  none
+*************************************************************************/
 void display_Menu (enum activeMenus menu)
 {
 	if (menu != activeMenu) lcd_clrscr(); // clear full lcd when switching to new menu, else only refresh data part
@@ -132,15 +141,16 @@ void display_Menu (enum activeMenus menu)
 			activeMenu = Imod_menu;
 			break;
 	}
-}
+}/* display_Menu */
 
 
-
-/**
- @brief    Display bar for data on specific menu
- @param    16bit word for line nr (max 1024) , value to be displayed and max value                                      
- @return   none
-*/
+/*************************************************************************
+Display bargraph for data
+Input:  line : line nr
+		val  : value to be displayed 
+		bar_max : max value used for bargraph
+Returns:  none
+*************************************************************************/
 void display_Bar (uint8_t line, uint16_t val, uint16_t bar_max )
 {
 	int i,j;
@@ -170,14 +180,14 @@ void display_Bar (uint8_t line, uint16_t val, uint16_t bar_max )
 			break;
 		}
 	}
-}
+} /* display_Bar */
 
 
-/**
- @brief    Display bargraphs for data on specific menu
- @param    menu to be displayed                                        
- @return   none
-*/
+/*************************************************************************
+Display bargraph for spefic menu
+Input:  menu : menu to be displayed
+Returns:  none
+*************************************************************************/
 void display_Bargraph (enum activeMenus menu)
 {
 	switch (menu)
@@ -200,14 +210,15 @@ void display_Bargraph (enum activeMenus menu)
 			break;
 	default: break;
 	}
-}
+}/* display_Bargraph */
 
 
-/**
- @brief    Display specific error 
- @param    none                                        
- @return   none
-*/
+
+/*************************************************************************
+Display the active error
+Input:   none
+Returns: none
+*************************************************************************/
 void display_error ()
 {
 	lcd_clrscr();
@@ -290,5 +301,5 @@ void display_error ()
 			display_textLine(4,"ON-OFF TO RESUME");
 			break;
 	}
-}
+}/* display_error */
 
