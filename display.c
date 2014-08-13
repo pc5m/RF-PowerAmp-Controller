@@ -2,7 +2,7 @@
  * display.c
  *
  * Created: 21-4-2014 9:36:46
- *  Author: cmobach
+ *  Author: C. Mobach,  PC5M
  */ 
 
 #include "display.h"
@@ -104,7 +104,7 @@ void display_Menu (enum activeMenus menu)
 	{
 	case Gen_Menu:
 			display_FormattedLine(1,"P  ",power.fwrd,4,0," W ");
-			if (power.swr == 999) display_textLine(2,"SWR ----    "); else  display_FormattedLine(2,"SWR 1:",power.swr,1,1,"  ");
+			if (power.swr == 999) display_textLine(2,"SWR         "); else  display_FormattedLine(2,"SWR 1:",power.swr,1,1,"  ");
 			display_FormattedLine(3,"I  ",current.moduleTotal,3,0," A  ");
 			display_FormattedLine(4,"T  ",temp_values.tempMax,3,0," C  ");  //should be maximum temperature = todo !
 			activeMenu = Gen_Menu;
@@ -113,7 +113,7 @@ void display_Menu (enum activeMenus menu)
 			display_FormattedLine(1,"FWD ",power.fwrd,4,0," W");
 			display_FormattedLine(2,"REF ",power.refl,3,0," W ");
 			display_FormattedLine(3,"INP ",power.input,4,1," W");
-			if (power.swr == 999) display_textLine(4,"SWR ----    "); else  display_FormattedLine(4,"SWR 1:",power.swr,1,1,"  ");
+			if (power.swr == 999) display_textLine(4,"SWR         "); else  display_FormattedLine(4,"SWR 1:",power.swr,1,1,"  ");
 			// display_FormattedLine(4,"SWR 1:",power.swr,1,1,"  ");
 			activeMenu = Pall_menu;
 		break;
@@ -281,7 +281,7 @@ void display_error ()
 	break;
 	case SWR:
 			display_textLine(1,"ERROR: SWR          ");
-			if (power.swr == 999) display_textLine(2,"SWR ----    "); else  display_FormattedLine(2,"SWR 1:",power.swr,1,1,"  ");
+			if (power.swr == 999) display_textLine(2,"SWR         "); else  display_FormattedLine(2,"SWR 1:",power.swr,1,1,"  ");
 			display_FormattedLine(3,"SWR Trip 1:",trip_values.swr_trip,1,1," ");
 			display_textLine(4,"ON-OFF TO RESUME");
 	break;

@@ -2,7 +2,7 @@
  * adc.h
  *
  * Created: 19-4-2014 19:41:25
- *  Author: cmobach
+ *  Author: C. Mobach,  PC5M
  */ 
 
 

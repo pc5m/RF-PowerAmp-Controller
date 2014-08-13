@@ -2,7 +2,7 @@
  * generalDefine.c
  *
  * Created: 21-4-2014 9:50:50
- *  Author: cmobach
+ *  Author: C. Mobach,  PC5M
  */ 
 
 #include "generalDefine.h"

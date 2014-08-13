@@ -1,22 +1,22 @@
 /*
- * CommProtocol.c
+ * comm.c
  *
  * Created: 8-5-2014 1:18:14
  *  Author: pc5m
  */ 
 
-#include "CommProtocol.h"
+#include "comm.h"
 #include "avr/io.h"
 #include "uart.h"
 #include "generalDefine.h"
-#include "control_atmega644.h"
+#include "main.h"
 #include "string.h"  //for memcpy
 
 Com_Message_struct Com_Message_Rx;		//Struct which contains data of the last received message
 
 
 // determine next state, based on previous state and received byte, fill Com_message structure with data
-uint8_t nextState (uint8_t prevState, uint8_t rxByte) 
+uint8_t comm_nextState (uint8_t prevState, uint8_t rxByte) 
 {
 	static uint8_t data_bytes_to_read;
 	switch(prevState)
@@ -77,7 +77,7 @@ void comm_RX_process(void)
 		else
 		{
 			rxData &= 0x00FF;
-            state =  nextState (state,(uint8_t)rxData);
+            state =  comm_nextState (state,(uint8_t)rxData);
 			if(state == EOFSYNC_RECEIVED)
 			{
 				switch(Com_Message_Rx.id)
@@ -86,26 +86,26 @@ void comm_RX_process(void)
 					case  PC_ID_SET_STATUS_AUTOTX_STATUS: if (Com_Message_Rx.data[0] == TRUE) controlConnected = TRUE; else controlConnected = FALSE; break;
 					case  PC_ID_SET_STATUS_AUTOTX_CURRENTS_ADC: if (Com_Message_Rx.data[0] == TRUE) autoTransmitCurrentADC = TRUE; else autoTransmitCurrentADC = FALSE; break;
 					case  PC_ID_SET_STATUS_AUTOTX_CURRENTS_VALS: if (Com_Message_Rx.data[0] == TRUE) autoTransmitCurrentVals = TRUE; else autoTransmitCurrentVals = FALSE; break;
-					case  PC_ID_REQ_CURRENT_TRIP_ADC: uart_tx_currentTripADC(); break;
-					case  PC_ID_REQ_CURRENT_TRIP_VAL: uart_tx_currentTripVal(); break;
-					case  PC_ID_REQ_CAL_CURRENTS_AMP2ADC: uart_tx_currentCalibrationAmp2ADC(); break;
-					case  PC_ID_REQ_CAL_CURRENTS_ADC2AMP: uart_tx_currentCalibrationADC2Amp(); break;
-					case  PC_ID_SET_CURRENT_TRIP_ADC: set_trip_current_adc(Com_Message_Rx.data[0],*(uint16_t *)&Com_Message_Rx.data[1]); break;
-					case  PC_ID_SET_CURRENT_TRIP_VAL: set_trip_current_val(Com_Message_Rx.data[0]); break;
-					case  PC_ID_SET_CAL_CURRENTS_AMP2ADC: set_cal_currents_amp2adc(Com_Message_Rx.data[0],*(float *)&(Com_Message_Rx.data[1])); break;
-					case  PC_ID_SET_CAL_CURRENTS_ADC2AMP: set_cal_currents_adc2amp(Com_Message_Rx.data[0],*(float *)&(Com_Message_Rx.data[1])); break;
+					case  PC_ID_REQ_CURRENT_TRIP_ADC: comm_uart_tx_currentTripADC(); break;
+					case  PC_ID_REQ_CURRENT_TRIP_VAL: comm_uart_tx_currentTripVal(); break;
+					case  PC_ID_REQ_CAL_CURRENTS_AMP2ADC: comm_uart_tx_currentCalibrationAmp2ADC(); break;
+					case  PC_ID_REQ_CAL_CURRENTS_ADC2AMP: comm_uart_tx_currentCalibrationADC2Amp(); break;
+					case  PC_ID_SET_CURRENT_TRIP_ADC: main_set_trip_current_adc(Com_Message_Rx.data[0],*(uint16_t *)&Com_Message_Rx.data[1]); break;
+					case  PC_ID_SET_CURRENT_TRIP_VAL: main_set_trip_current_val(Com_Message_Rx.data[0]); break;
+					case  PC_ID_SET_CAL_CURRENTS_AMP2ADC: main_set_cal_currents_amp2adc(Com_Message_Rx.data[0],*(float *)&(Com_Message_Rx.data[1])); break;
+					case  PC_ID_SET_CAL_CURRENTS_ADC2AMP: main_set_cal_currents_adc2amp(Com_Message_Rx.data[0],*(float *)&(Com_Message_Rx.data[1])); break;
 					case  PC_ID_SET_STATUS_AUTOTX_POWERS_ADC:  if (Com_Message_Rx.data[0] == TRUE) autoTransmitPowerADC = TRUE; else autoTransmitPowerADC = FALSE; break;
 					case  PC_ID_SET_STATUS_AUTOTX_POWERS_VALS:  if (Com_Message_Rx.data[0] == TRUE) autoTransmitPowerVals = TRUE; else autoTransmitPowerVals = FALSE; break;
-					case  PC_ID_REQ_POWERS_TRIP_ADC: uart_tx_powerTripADC(); break;
-					case  PC_ID_REQ_POWERS_TRIP_VALS: uart_tx_powerTripVals(); break;
-					case  PC_ID_SET_POWERS_TRIP_ADC: set_trip_powers_adc(Com_Message_Rx.data[0],*(uint16_t *)&Com_Message_Rx.data[1]); break;
-					case  PC_ID_SET_POWERS_TRIP_VAL: set_trip_powers_val(Com_Message_Rx.data[0],*(uint16_t *)&Com_Message_Rx.data[1]); break;
-					case  PC_ID_SET_SWR_TRIP_VAL: set_trip_swr_val(*(float *)&Com_Message_Rx.data[0]); break;
+					case  PC_ID_REQ_POWERS_TRIP_ADC: comm_uart_tx_powerTripADC(); break;
+					case  PC_ID_REQ_POWERS_TRIP_VALS: comm_uart_tx_powerTripVals(); break;
+					case  PC_ID_SET_POWERS_TRIP_ADC: main_set_trip_powers_adc(Com_Message_Rx.data[0],*(uint16_t *)&Com_Message_Rx.data[1]); break;
+					case  PC_ID_SET_POWERS_TRIP_VAL: main_set_trip_powers_val(Com_Message_Rx.data[0],*(uint16_t *)&Com_Message_Rx.data[1]); break;
+					case  PC_ID_SET_SWR_TRIP_VAL: main_set_trip_swr_val(*(float *)&Com_Message_Rx.data[0]); break;
 					case  PC_ID_SET_STATUS_AUTOTX_TEMP: if (Com_Message_Rx.data[0] == TRUE) autoTransmitTemperature = TRUE; else autoTransmitTemperature = FALSE; break;
-					case  PC_ID_REQ_TEMP_TRIP: uart_tx_temperatureTrip(); break;
-					case  PC_ID_SET_TEMP_TRIP: set_trip_temperature(Com_Message_Rx.data[0]); break;	
-				    case  PC_ID_REQ_CAL_POWERS_ADC2W_RC_B: uart_tx_powerCalibrationADC2W_RC_B(Com_Message_Rx.data[0]); break;
-					case  PC_ID_SET_CAL_POWERS_ADC2W_RC_B: set_powerCalibrationADC2W_RC_B(Com_Message_Rx.data[0],Com_Message_Rx.data[1],(uint16_t *)&Com_Message_Rx.data[2],(float *)&Com_Message_Rx.data[12],(float *)&Com_Message_Rx.data[28]); break;
+					case  PC_ID_REQ_TEMP_TRIP: comm_uart_tx_temperatureTrip(); break;
+					case  PC_ID_SET_TEMP_TRIP: main_set_trip_temperature(Com_Message_Rx.data[0]); break;	
+				    case  PC_ID_REQ_CAL_POWERS_ADC2W_RC_B: comm_uart_tx_powerCalibrationADC2W_RC_B(Com_Message_Rx.data[0]); break;
+					case  PC_ID_SET_CAL_POWERS_ADC2W_RC_B: main_set_powerCalibrationADC2W_RC_B(Com_Message_Rx.data[0],Com_Message_Rx.data[1],(uint16_t *)&Com_Message_Rx.data[2],(float *)&Com_Message_Rx.data[12],(float *)&Com_Message_Rx.data[28]); break;
 					// case  PC_ID_SET_CAL_POWERS_ADC2W_RC_B: set_powerCalibrationADC2W_RC_B((uint8_t *)&Com_Message_Rx.data[0]); break;
 					default: break;
 				}
@@ -140,12 +140,12 @@ void comm_tx_version(){
 
 
 /*************************************************************************
-Function: uart_tx_status()
+Function: comm_uart_tx_status()
 Purpose:  Transmit the status of TX/RX, PSU On/Off, Error/Trip times 1 bytes (uint8_t)
 Input:    none
 Returns:  none
 **************************************************************************/
-void uart_tx_status(){
+void comm_uart_tx_status(){
 	#define BYTES 1  // nr of bytes 1 * 1;
 	uint8_t txBuffer[BYTES+5];
 	uint8_t i;
@@ -162,12 +162,12 @@ void uart_tx_status(){
 }
 
 /*************************************************************************
-Function: uart_tx_temperatures()
+Function: comm_uart_tx_temperatures()
 Purpose:  Transmit the actual temperature values via UART
 Input:    none
 Returns:  none
 **************************************************************************/
-void uart_tx_temperatures()
+void comm_uart_tx_temperatures()
 {
 	uint8_t txBuffer[9];
 	uint8_t i;
@@ -187,12 +187,12 @@ void uart_tx_temperatures()
 }
 
 /*************************************************************************
-Function: uart_tx_temperatureTrip()
+Function: comm_uart_tx_temperatureTrip()
 Purpose:  Transmit the temperature trip value via UART as 1 times 1 bytes (uint8_t)
 Input:    none
 Returns:  none
 **************************************************************************/
-void uart_tx_temperatureTrip(){
+void comm_uart_tx_temperatureTrip(){
 	#define BYTES 1 // nr of bytes 1 * 1;
 	uint8_t txBuffer[BYTES+5];
 	uint8_t i;
@@ -211,12 +211,12 @@ void uart_tx_temperatureTrip(){
 }
 
 /*************************************************************************
-Function: uart_tx_current vals()
+Function: comm_uart_tx_current vals()
 Purpose:  Transmit the actual current values via UART as 4 times 4 bytes (float)
 Input:    none
 Returns:  none
 **************************************************************************/
-void uart_tx_currentVals()
+void comm_uart_tx_currentVals()
 {
 	uint8_t txBuffer[21];
 	uint8_t i;
@@ -242,12 +242,12 @@ void uart_tx_currentVals()
 
 
 /*************************************************************************
-Function: uart_tx_currentADCVals()
+Function: comm_uart_tx_currentADCVals()
 Purpose:  Transmit the current ADC values via UART as 4 times 2 bytes (uint16t)
 Input:    none
 Returns:  none
 **************************************************************************/
-void uart_tx_currentADCVals(){
+void comm_uart_tx_currentADCVals(){
 	uint8_t txBuffer[13];
 	uint8_t i;
 	unsigned char *p;
@@ -271,12 +271,12 @@ void uart_tx_currentADCVals(){
 }
 
 /*************************************************************************
-Function: uart_tx_currentTripADC()
+Function: comm_uart_tx_currentTripADC()
 Purpose:  Transmit the current Trip ADC values via UART as 4 times 2 bytes (uint16t)
 Input:    none
 Returns:  none
 **************************************************************************/
-void uart_tx_currentTripADC(){
+void comm_uart_tx_currentTripADC(){
 	uint8_t txBuffer[13];
 	uint8_t i;
 	unsigned char *p;
@@ -300,12 +300,12 @@ void uart_tx_currentTripADC(){
 }
 
 /*************************************************************************
-Function: uart_tx_currentTripVal()
+Function: comm_uart_tx_currentTripVal()
 Purpose:  Transmit the current Trip values via UART as 1 times 2 bytes (uint16_t)
 Input:    none
 Returns:  none
 **************************************************************************/
-void uart_tx_currentTripVal(){
+void comm_uart_tx_currentTripVal(){
 	uint8_t txBuffer[7];
 	uint8_t i;
 	unsigned char *p;
@@ -323,12 +323,12 @@ void uart_tx_currentTripVal(){
 }
 
 /*************************************************************************
-Function: uart_tx_currentCalibrationADC2Amp()
+Function: comm_uart_tx_currentCalibrationADC2Amp()
 Purpose:  Transmit the ADC to current calibration factors via UART as 4 times 4 bytes (float)
 Input:    none
 Returns:  none
 **************************************************************************/
-void uart_tx_currentCalibrationADC2Amp(){
+void comm_uart_tx_currentCalibrationADC2Amp(){
 	uint8_t txBuffer[21];
 	uint8_t i;
 	unsigned char *p;
@@ -357,7 +357,7 @@ Purpose:  Transmit the current to ADC calibration factors via UART as 4 times 4 
 Input:    none
 Returns:  none
 **************************************************************************/
-void uart_tx_currentCalibrationAmp2ADC(){
+void comm_uart_tx_currentCalibrationAmp2ADC(){
 	uint8_t txBuffer[21];
 	uint8_t i;
 	unsigned char *p;
@@ -382,12 +382,12 @@ void uart_tx_currentCalibrationAmp2ADC(){
 
 
 /*************************************************************************
-Function: uart_tx_powerADCVals()
+Function: comm_uart_tx_powerADCVals()
 Purpose:  Transmit the current power ADC values via UART as 3 times 2 bytes (uint16_t)
 Input:    none
 Returns:  none
 **************************************************************************/
-void uart_tx_powerADCVals(){
+void comm_uart_tx_powerADCVals(){
 	#define BYTES 6  // nr of bytes 3 * 2;
 	uint8_t txBuffer[BYTES+5];
 	uint8_t i;
@@ -410,12 +410,12 @@ void uart_tx_powerADCVals(){
 }
 
 /*************************************************************************
-Function: uart_tx_powerTripADC()
+Function: comm_uart_tx_powerTripADC()
 Purpose:  Transmit the current power trip ADC values via UART as 3 times 2 bytes (uint16_t)
 Input:    none
 Returns:  none
 **************************************************************************/
-void uart_tx_powerTripADC(){
+void comm_uart_tx_powerTripADC(){
 	#define BYTES 6
 	uint8_t txBuffer[BYTES+5];
 	uint8_t i;
@@ -438,12 +438,12 @@ void uart_tx_powerTripADC(){
 }
 
 /*************************************************************************
-Function: uart_tx_powerTripVals()
+Function: comm_uart_tx_powerTripVals()
 Purpose:  Transmit the current power trip values via UART as 3 times 2 bytes (uint16_t)
 Input:    none
 Returns:  none
 **************************************************************************/
-void uart_tx_powerTripVals(){
+void comm_uart_tx_powerTripVals(){
 	#define BYTES 10
 	uint8_t txBuffer[BYTES+5];
 	uint8_t i;
@@ -468,12 +468,12 @@ void uart_tx_powerTripVals(){
 }
 
 /*************************************************************************
-Function: uart_tx_powerVals()
+Function: comm_uart_tx_powerVals()
 Purpose:  Transmit the power values incl. swr via UART as 4 times 4 bytes (float)
 Input:    none
 Returns:  none
 **************************************************************************/
-void uart_tx_powerVals(){
+void comm_uart_tx_powerVals(){
 	#define BYTES 16 // nr of bytes 4 * 4;
 	uint8_t txBuffer[BYTES+5];
 	uint8_t i;
@@ -499,12 +499,12 @@ void uart_tx_powerVals(){
 
 
 /*************************************************************************
-Function: uart_tx_powerCalibrationADC2W_RC_B()
+Function: comm_uart_tx_powerCalibrationADC2W_RC_B()
 Purpose:  Transmit the ADC to Powercalibration factors via UART new format
 Input:    uint8_t, requested power type (POWER_FWD, POWER_REFL or POWER_IN)
 Returns:  none
 **************************************************************************/
-void uart_tx_powerCalibrationADC2W_RC_B(uint8_t powerID){
+void comm_uart_tx_powerCalibrationADC2W_RC_B(uint8_t powerID){
 	#define BYTES 44 // bytes 1 to 44
 	uint8_t txBuffer[BYTES+5];
 	uint8_t i;

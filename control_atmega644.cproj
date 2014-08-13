@@ -113,16 +113,16 @@
     <Compile Include="ADC.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="CommProtocol.c">
+    <Compile Include="comm.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="CommProtocol.h">
+    <Compile Include="comm.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="control_atmega644.c">
+    <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="control_atmega644.h">
+    <Compile Include="main.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="display.c">

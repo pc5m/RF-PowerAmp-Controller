@@ -1,5 +1,5 @@
 /*
- * CommProtocol.h
+ * comm.h
  *
  * Created: 8-5-2014 1:18:38
  *  Author: pc5m
@@ -94,25 +94,25 @@ extern void comm_RX_process();
  *  @return  none
  */
 extern void comm_tx_version();  // transmit version number of firmware
-extern void uart_tx_temperatures();
-extern void uart_tx_temperatureTrip();
+extern void comm_uart_tx_temperatures();
+extern void comm_uart_tx_temperatureTrip();
 
-extern void uart_tx_currentVals();
-extern void uart_tx_currentADCVals();
-extern void uart_tx_currentTripADC();
-extern void uart_tx_currentTripVal();
-extern void uart_tx_currentCalibrationADC2Amp();
-extern void uart_tx_currentCalibrationAmp2ADC();
+extern void comm_uart_tx_currentVals();
+extern void comm_uart_tx_currentADCVals();
+extern void comm_uart_tx_currentTripADC();
+extern void comm_uart_tx_currentTripVal();
+extern void comm_uart_tx_currentCalibrationADC2Amp();
+extern void comm_uart_tx_currentCalibrationAmp2ADC();
 
-extern void uart_tx_powerVals();
-extern void uart_tx_powerADCVals();
-extern void uart_tx_powerTripADC();
-extern void uart_tx_powerTripVals();
+extern void comm_uart_tx_powerVals();
+extern void comm_uart_tx_powerADCVals();
+extern void comm_uart_tx_powerTripADC();
+extern void comm_uart_tx_powerTripVals();
 
-extern void uart_tx_powerCalibrationADC2W_RC_B(uint8_t);
+extern void comm_uart_tx_powerCalibrationADC2W_RC_B(uint8_t);
 // extern void uart_tx_powerCalibrationW2ADC_RC_B(uint8_t);
 
-extern void uart_tx_status();  // status of TX/RX, PSU On/Off, Error/Trip
+extern void comm_uart_tx_status();  // status of TX/RX, PSU On/Off, Error/Trip
 
 
 

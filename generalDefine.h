@@ -2,7 +2,7 @@
  * generalDefine.h
  *
  * Created: 10-12-2013
- * Author: cmobach
+ * Author: C. Mobach,  PC5M
  */ 
 
 

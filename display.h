@@ -2,7 +2,7 @@
  * display.h
  *
  * Created: 21-4-2014 9:36:27
- *  Author: cmobach
+ *  Author: C. Mobach,  PC5M
  */ 
 
 #include <inttypes.h>
@@ -13,7 +13,7 @@
 #define DISPLAY_H_
 
 #define welcomeLine1  "                    "
-#define welcomeLine2  "SSPA CONTROLLER V0.9"
+#define welcomeLine2  "    144 MHz SSPA    "
 #define welcomeLine3  "   PC5M/PA0V 2014   "
 #define welcomeLine4  "                    "
 
