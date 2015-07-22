@@ -30,7 +30,14 @@
 #define BUTTON_IN   PD5 // TP21
 
 #define UART_BAUD_RATE      115200
+// #define UART_BAUD_RATE      9600
 uint8_t uartTxBuffer[10];
+
+volatile uint8_t displayRateCounter;
+volatile uint8_t serialCommunicationCounter;
+
+#define displayRate 10 // 1 = 10ms
+#define serialCommunicationRate 10 //1 = 10ms 
 
 /*
  * main_get_ptt() - get PTT input state, return ON (1) if input is low, return OFF (0) if input is high
@@ -435,8 +442,9 @@ void main_LoadEEpromVals()
 
 void main_ProcessSerialCommunication() 
 {
-	if (controlConnected == TRUE)
+	if ((controlConnected == TRUE) && (serialCommunicationCounter >= serialCommunicationRate))
 	{
+		serialCommunicationCounter = 0;  // reset counter
 		comm_uart_tx_status();
 		if (autoTransmitCurrentVals == TRUE) {
 			comm_uart_tx_currentVals();
@@ -451,22 +459,39 @@ void main_ProcessSerialCommunication()
 			comm_uart_tx_powerADCVals();
 		}
 		if (autoTransmitTemperature == TRUE) {
-			comm_uart_tx_temperatures();				
+			comm_uart_tx_temperatures();
 		}
 	}
-	comm_RX_process();   // check if a command is received and act upon
+	 comm_RX_process();   // check if a command is received and act upon
+}
+
+void timer_init()
+{
+	bit_set(TCCR0B, BIT(CS02)|BIT(CS00));  // set prescaler counter A to 1024
+	OCR0A = 180; // create 10ms 
+	bit_set(TIMSK0, BIT(OCIE0A)); // Timer interrupt mask for counter A, compare match with OCR0A 	
 }
 
 
-
-
+ISR(TIMER0_COMPA_vect)
+{
+   cli();
+   displayRateCounter++;
+   if (displayRateCounter >= 200) displayRateCounter = 200;
+   serialCommunicationCounter++;
+   if (serialCommunicationCounter >= 200) serialCommunicationCounter = 200;
+   TCNT0 = 0; // reset counter
+   // PORTB = PORTB ^ BIT(LED_TX);  // for test purposes only
+   sei();
+}
 
 
 int main(void)
 {
 	uint16_t temperatureCounterDisplay = 0;
 	uint8_t errorNotCancelled = TRUE;
-	uint16_t errorDisplayRateIndex = 0;
+	uint16_t errorDisplayRateIndex = 0;  //slow down displayrate when error
+	uint8_t displayRateIndex = 0;  // slow down displayrate
 	MCUCR=(1<<JTD); // disable JTAG on portC
 	MCUCR=(1<<JTD); // disable JTAG on portC
     main_SSPA_IO_init();      // initialize unit: BIAS = OFF, PSU = ON, RX STAT;
@@ -476,6 +501,7 @@ int main(void)
 	adc_init();
 	lm75_init();
 	uart_init( UART_BAUD_SELECT(UART_BAUD_RATE,F_CPU) ); 
+	timer_init(); // timer used for display and serial communication update rate
 	sei(); // needed for uart libray
 	activeMenu = Imod_menu;  //default menu is current display of all  4 modules
 	nextMenu = Gen_Menu;
@@ -532,7 +558,11 @@ int main(void)
 					}
 				}
 			}
-			display_Menu(nextMenu);
+			if (displayRateCounter >= displayRate)
+			{
+				displayRateCounter = 0;
+				display_Menu(nextMenu);
+			}
 			activeMenu = nextMenu;
 			display_Bargraph(activeMenu);
 			
@@ -542,7 +572,6 @@ int main(void)
 				main_set_TX(OFF);
 				 	
 			if (main_button_pressed() == TRUE) nextMenu = nextActiveMenu();
-
 			main_ProcessSerialCommunication();  //if connected than transmit serial data
     }
 }
